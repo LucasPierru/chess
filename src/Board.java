@@ -1,6 +1,7 @@
 public class Board {
     private Piece[][] board = new Piece[8][8];
     private Color sideToMove;
+    private final String[] letters = {"a", "b", "c", "d", "e", "f", "g", "h"};
 
     public Board() {
         this.initializeBoard();
@@ -61,15 +62,21 @@ public class Board {
 
     public void print() {
         for (int i = this.board.length - 1; i >= 0; i--) {
+            System.out.print((i + 1) + " ");
             for (int j = 0; j < this.board[i].length; j++) {
                 if(this.board[i][j] == null) {
-                    System.out.print(" ");
+                    System.out.print("    ");
                 } else {
                     System.out.print(this.board[i][j].getColor().toString().charAt(0) + "-" + this.board[i][j].getName() + " ");
                 }
             }
             System.out.println();
         }
+        for (int k = 0; k < this.letters.length; k++) {
+            System.out.print("  ");
+            System.out.print(" " + letters[k]);
+        }
+        System.out.println();
     }
 
 
