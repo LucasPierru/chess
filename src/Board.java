@@ -23,6 +23,10 @@ public class Board {
         this.board[square.row()][square.col()] = piece;
     }
 
+    public boolean isValidSquare(Square square) {
+        return square.row() >= 0 && square.row() < 8 && square.col() >= 0 && square.col() < 8;
+    }
+
     public void initializeBoard() {
         //Initialize white pieces
         setPiece(new Square(0, 0), new Rook(Color.WHITE));

@@ -14,81 +14,34 @@ public class Rook extends Piece{
 
     @Override
     public List<Move> calculateLegalMoves(Board board, Square from) {
-        int startCol = from.col() - 1;
-        int endCol = from.col() + 1;
-        int startRow = from.row() - 1;
-        int endRow = from.row() + 1;
         List<Move> legalMoves = new ArrayList<>();
-        Piece[][] pieces = board.getBoard();
 
-        Rook rook = (Rook)pieces[from.row()][from.col()];
+        Piece piece = board.getPiece(from);
+        if (!(piece instanceof Rook)) return legalMoves;
+        Rook rook = (Rook)piece;
+        Color rookColor = rook.getColor();
 
-        while (startCol >= 0) {
-            Piece currentSquare = pieces[from.row()][startCol];
-            Move move = new Move(from, new Square(from.row(), startCol));
-            if(currentSquare == null) {
-                legalMoves.add(move);
-                startCol--;
-                continue;
-            }
-            if(currentSquare.getColor() != rook.getColor()) {
-                legalMoves.add(move);
-                break;
-            }
-            if(currentSquare.getColor() == rook.getColor()) {
-                break;
-            }
+        int[][] directions = { {0, -1}, {0, 1}, {-1, 0}, {1, 0} };
 
-        }
+        for (int[] dir : directions) {
+            int row = from.row() + dir[0];
+            int col = from.col() + dir[1];
 
-        while (endCol < 8) {
-            Piece currentSquare = pieces[from.row()][endCol];
-            Move move = new Move(from, new Square(from.row(), endCol));
-            if(currentSquare == null) {
-                legalMoves.add(move);
-                endCol++;
-                continue;
-            }
-            if(currentSquare.getColor() != rook.getColor()) {
-                legalMoves.add(move);
-                break;
-            }
-            if(currentSquare.getColor() == rook.getColor()) {
-                break;
-            }
-        }
+            while (board.isValidSquare(new Square(row, col))) {
+                Piece currentPiece = board.getPiece(new Square(row, col));
+                Square to = new Square(row, col);
+                Move move = new Move(from, to);
 
-        while (startRow >= 0) {
-            Piece currentSquare = pieces[startRow][from.col()];
-            Move move = new Move(from, new Square(startRow, from.col()));
-            if(currentSquare == null) {
-                legalMoves.add(move);
-                startRow--;
-                continue;
-            }
-            if(currentSquare.getColor() != rook.getColor()) {
-                legalMoves.add(move);
-                break;
-            }
-            if(currentSquare.getColor() == rook.getColor()) {
-                break;
-            }
-        }
-
-        while (endRow < 8) {
-            Piece currentSquare = pieces[endRow][from.col()];
-            Move move = new Move(from, new Square(endRow, from.col()));
-            if(currentSquare == null) {
-                legalMoves.add(move);
-                endRow++;
-                continue;
-            }
-            if (currentSquare.getColor() != rook.getColor()) {
-                legalMoves.add(move);
-                break;
-            }
-            if(currentSquare.getColor() == rook.getColor()) {
-                break;
+                if(currentPiece == null) {
+                    legalMoves.add(move);
+                } else {
+                    if(currentPiece.getColor() != rookColor) {
+                        legalMoves.add(move);
+                    }
+                    break;
+                }
+                row += dir[0];
+                col += dir[1];
             }
         }
 
