@@ -6,7 +6,7 @@ public class Main {
     public static void main(String[] args) {
         Board board = new Board();
         board.print();
-        Square square = new Square(7,1);
+        Square square = new Square(4,4);
         Piece piece = board.getPiece(square);
         List<Move> legalMoves = piece.calculateLegalMoves(board, square);
         System.out.println(legalMoves + " " + piece.getColor() + "-" + piece.getName() + " has " + legalMoves.size() + " Moves available");

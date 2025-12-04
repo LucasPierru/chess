@@ -33,7 +33,7 @@ public class Board {
         setPiece(new Square(0, 1), new Knight(Color.WHITE));
         setPiece(new Square(0, 2), new Bishop(Color.WHITE));
         setPiece(new Square(0, 3), new Queen(Color.WHITE));
-        setPiece(new Square(0, 4), new King(Color.WHITE));
+        setPiece(new Square(4, 4), new King(Color.WHITE));
         setPiece(new Square(0, 5), new Bishop(Color.WHITE));
         setPiece(new Square(0, 6), new Knight(Color.WHITE));
         setPiece(new Square(0, 7), new Rook(Color.WHITE));
