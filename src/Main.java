@@ -5,8 +5,8 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         Board board = new Board();
+        Square square = new Square(7,4);
         board.print();
-        Square square = new Square(4,4);
         Piece piece = board.getPiece(square);
         List<Move> legalMoves = piece.calculateLegalMoves(board, square);
         System.out.println(legalMoves + " " + piece.getColor() + "-" + piece.getName() + " has " + legalMoves.size() + " Moves available");

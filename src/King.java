@@ -28,10 +28,70 @@ public class King extends Piece{
         }
 
         //check for knight
+        int[][] knightCaptureDirections = { {2, -1}, {2, 1}, {-2, -1}, {-2, 1}, {1, -2}, {1, 2}, {-1, -2}, {-1, 2} };
+        for (int[] direction : knightCaptureDirections){
+            Square capture = new Square(to.row() +  direction[0], to.col() + direction[1]);
+            if(board.isValidSquare(capture)) {
+                Piece piece = board.getPiece(capture);
+                if(piece instanceof Knight && piece.getColor() != this.getColor()) {
+                    return true;
+                }
+            }
+        }
 
         //check for bishop/queen
+        int[][] bishopCaptureDirections = { {1, 1}, {1, -1}, {-1, -1}, {-1, 1} };
+        for (int[] direction : bishopCaptureDirections){
+            int row = to.row() + direction[0];
+            int col = to.col() + direction[1];
+
+            while (board.isValidSquare(new Square(row, col))) {
+                Piece piece = board.getPiece(new Square(row, col));
+                if((piece instanceof Queen || piece instanceof Bishop) && piece.getColor() != this.getColor()) {
+                    return true;
+                }
+
+                if(piece != null && ((!(piece instanceof Queen) && !(piece instanceof Bishop)) || piece.getColor() == this.getColor())) {
+                    break;
+                }
+
+                row += direction[0];
+                col += direction[1];
+            }
+        }
 
         //check for rook/queen
+        int[][] rookCaptureDirections = { {1, 0}, {0, -1}, {-1, 0}, {0, 1} };
+        for (int[] direction : rookCaptureDirections){
+            int row = to.row() + direction[0];
+            int col = to.col() + direction[1];
+
+            while (board.isValidSquare(new Square(row, col))) {
+                Piece piece = board.getPiece(new Square(row, col));
+                if((piece instanceof Queen || piece instanceof Rook) && piece.getColor() != this.getColor()) {
+                    return true;
+                }
+
+                if(piece != null && ((!(piece instanceof Queen) && !(piece instanceof Rook)) || piece.getColor() == this.getColor())) {
+                    break;
+                }
+
+                row += direction[0];
+                col += direction[1];
+            }
+        }
+
+        //check for king
+        int[][] kingCaptureDirections = { {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1} };
+        for (int[] direction : kingCaptureDirections){
+            Square capture = new Square(to.row() +  direction[0], to.col() + direction[1]);
+            if(board.isValidSquare(capture)) {
+                Piece piece = board.getPiece(capture);
+                if(piece instanceof King && piece.getColor() != this.getColor()) {
+                    return true;
+                }
+            }
+        }
 
         return false;
     }
