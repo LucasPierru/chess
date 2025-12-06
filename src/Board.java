@@ -1,6 +1,6 @@
 public class Board {
     private Piece[][] board = new Piece[8][8];
-    private Color sideToMove;
+    private Color sideToMove = Color.WHITE;
     private final String[] letters = {"a", "b", "c", "d", "e", "f", "g", "h"};
 
     public Board() {
@@ -25,6 +25,103 @@ public class Board {
 
     public boolean isValidSquare(Square square) {
         return square.row() >= 0 && square.row() < 8 && square.col() >= 0 && square.col() < 8;
+    }
+
+    public void switchSide() {
+        this.sideToMove = this.sideToMove == Color.WHITE ? Color.BLACK : Color.WHITE;
+    }
+
+    public Color getSideToMove() {
+        return this.sideToMove;
+    }
+
+    public boolean isCheckmate() {
+
+        return false;
+    }
+
+    public boolean isSquareAttacked(Square to, Color pieceColor) {
+        //check for pawn
+        int[] pawnCaptureDirections = {-1, 1};
+        int colorDirection = pieceColor == Color.WHITE ? 1 : -1;
+
+        for (int direction : pawnCaptureDirections){
+            Square capture = new Square(to.row() +  colorDirection, to.col() + direction);
+            if(this.isValidSquare(capture)) {
+                Piece piece = this.getPiece(capture);
+                if(piece instanceof Pawn && piece.getColor() != pieceColor) {
+                    return true;
+                }
+            }
+        }
+
+        //check for knight
+        int[][] knightCaptureDirections = { {2, -1}, {2, 1}, {-2, -1}, {-2, 1}, {1, -2}, {1, 2}, {-1, -2}, {-1, 2} };
+        for (int[] direction : knightCaptureDirections){
+            Square capture = new Square(to.row() +  direction[0], to.col() + direction[1]);
+            if(this.isValidSquare(capture)) {
+                Piece piece = this.getPiece(capture);
+                if(piece instanceof Knight && piece.getColor() != pieceColor) {
+                    return true;
+                }
+            }
+        }
+
+        //check for bishop/queen
+        int[][] bishopCaptureDirections = { {1, 1}, {1, -1}, {-1, -1}, {-1, 1} };
+        for (int[] direction : bishopCaptureDirections){
+            int row = to.row() + direction[0];
+            int col = to.col() + direction[1];
+
+            while (this.isValidSquare(new Square(row, col))) {
+                Piece piece = this.getPiece(new Square(row, col));
+                if((piece instanceof Queen || piece instanceof Bishop) && piece.getColor() != pieceColor) {
+                    return true;
+                }
+
+                if(piece != null && ((!(piece instanceof Queen) && !(piece instanceof Bishop)) || piece.getColor() == pieceColor)) {
+                    break;
+                }
+
+                row += direction[0];
+                col += direction[1];
+            }
+        }
+
+        //check for rook/queen
+        int[][] rookCaptureDirections = { {1, 0}, {0, -1}, {-1, 0}, {0, 1} };
+        for (int[] direction : rookCaptureDirections){
+            int row = to.row() + direction[0];
+            int col = to.col() + direction[1];
+
+            while (this.isValidSquare(new Square(row, col))) {
+                Piece piece = this.getPiece(new Square(row, col));
+                if((piece instanceof Queen || piece instanceof Rook) && piece.getColor() != pieceColor) {
+                    return true;
+                }
+
+                if(piece != null && ((!(piece instanceof Queen) && !(piece instanceof Rook)) || piece.getColor() == pieceColor)) {
+                    break;
+                }
+
+                row += direction[0];
+                col += direction[1];
+            }
+        }
+
+        //check for king
+        int[][] kingCaptureDirections = { {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1} };
+        for (int[] direction : kingCaptureDirections){
+            Square capture = new Square(to.row() +  direction[0], to.col() + direction[1]);
+            if(this.isValidSquare(capture)) {
+                Piece piece = this.getPiece(capture);
+                if(piece instanceof King && piece.getColor() != pieceColor) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public void initializeBoard() {

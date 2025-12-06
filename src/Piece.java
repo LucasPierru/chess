@@ -8,10 +8,29 @@ public abstract class Piece {
         this.color = color;
     }
 
-    abstract public void move();
+    public void move(Board board, Square from, Square to) throws IllegalMoveException {
+        Piece piece = board.getPiece(from);
+
+        if (piece == null) {
+            throw new IllegalMoveException("No piece at " + from);
+        }
+
+        List<Move> legalMoves = this.calculateLegalMoves(board, from);
+
+        for (Move move: legalMoves) {
+            if (move.to().equals(to)) {
+                board.setPiece(to, piece);
+                board.setPiece(from, null);
+                board.switchSide();
+                return;
+            }
+        }
+
+        throw new IllegalMoveException("Illegal move: " + piece.getClass().getSimpleName()
+                + " cannot move from " + from + " to " + to);
+    }
 
     public abstract List<Move> calculateLegalMoves(Board board, Square from);
-
 
     public String getName() {
         return name;

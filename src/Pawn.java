@@ -8,11 +8,6 @@ public class Pawn extends Piece{
     }
 
     @Override
-    public void move() {
-
-    }
-
-    @Override
     public List<Move> calculateLegalMoves(Board board, Square from) {
         List<Move> legalMoves = new ArrayList<>();
         Piece piece = board.getPiece(from);
