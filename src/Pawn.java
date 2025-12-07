@@ -8,38 +8,33 @@ public class Pawn extends Piece{
     }
 
     @Override
-    public List<Move> calculateLegalMoves(Board board, Square from) {
+    public List<Move> calculateLegalMoves(BoardView board, Square from) {
         List<Move> legalMoves = new ArrayList<>();
-        Piece piece = board.getPiece(from);
 
-        if (!(piece instanceof Pawn)) return legalMoves;
+        int direction = this.getColor() == Color.WHITE ? 1 : -1;
+        int startRow = this.getColor() == Color.WHITE ? 1 : 6;
 
-        Pawn pawn = (Pawn)piece;
+        Square firstSquare = board.getSquare(from.getRow() + direction, from.getCol());
+        Square secondSquare = board.getSquare(from.getRow() + 2 * direction, from.getCol());
 
-
-        int direction = pawn.getColor() == Color.WHITE ? 1 : -1;
-        int startRow = pawn.getColor() == Color.WHITE ? 1 : 6;
-
-        Square firstSquare = new Square(from.row() + direction, from.col());
-        Square secondSquare = new Square(from.row() + 2 * direction, from.col());
-        Piece piece1Square = board.getPiece(firstSquare);
-        Piece piece2Square = board.getPiece(secondSquare);
+        Piece piece1Square = firstSquare.getPiece();
+        Piece piece2Square = secondSquare.getPiece();
 
         if(piece1Square == null) {
             legalMoves.add(new Move(from, firstSquare));
-            if(from.row() == startRow && piece2Square == null) {
+            if(from.getRow() == startRow && piece2Square == null) {
                 legalMoves.add(new Move(from, secondSquare));
             }
         }
 
-        Square rightCapture = new Square(from.row() + direction,from.col() + 1);
-        Square leftCapture = new Square(from.row() + direction, from.col() - 1);
+        Square rightCapture = board.getSquare(from.getRow() + direction,from.getCol() + 1);
+        Square leftCapture = board.getSquare(from.getRow() + direction, from.getCol() - 1);
 
-        if(from.col() < 7 && board.getPiece(rightCapture) != null) {
+        if(from.getCol() < 7 && rightCapture.getPiece() != null) {
             legalMoves.add(new Move(from, rightCapture));
         }
 
-        if(from.col() > 0 && board.getPiece(leftCapture) != null) {
+        if(from.getCol() > 0 && leftCapture.getPiece() != null) {
             legalMoves.add(new Move(from, leftCapture));
         }
 

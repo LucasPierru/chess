@@ -7,34 +7,31 @@ public class King extends Piece{
         this.setName("K");
     }
 
-    private boolean isKingInCheck(Board board, Square to) {
-        return board.isSquareAttacked(to, this.getColor());
+    private boolean isKingInCheck(BoardView board, Square to) {
+        Square kingPosition = board.getKingPosition(this.getColor());
+        return board.isSquareAttacked(kingPosition, this.getColor());
     }
 
     @Override
-    public List<Move> calculateLegalMoves(Board board, Square from) {
+    public List<Move> calculateLegalMoves(BoardView board, Square from) {
         List<Move> legalMoves = new ArrayList<>();
-
-        Piece piece = board.getPiece(from);
-        if (!(piece instanceof King)) return legalMoves;
-        King king = (King)piece;
-        Color kingColor = king.getColor();
+        Color kingColor = this.getColor();
 
         int[][] directions = { {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1} };
 
         for (int[] dir : directions) {
-            int row = from.row() + dir[0];
-            int col = from.col() + dir[1];
-            Square to = new Square(row, col);
+            int row = from.getRow() + dir[0];
+            int col = from.getCol() + dir[1];
+            Square to = board.getSquare(row, col);
 
-            if(!board.isValidSquare(to)){
+            if(!board.isValidSquare(row, col)){
                 continue;
             }
 
-            Piece currentPiece = board.getPiece(to);
+            Piece currentPiece = board.getSquare(row, col).getPiece();
             Move move = new Move(from, to);
 
-            if(currentPiece == null && !this.isKingInCheck(board, to)) {
+            if(currentPiece == null && !board.isSquareAttacked(to, this.getColor())) {
                 legalMoves.add(move);
             } else if(currentPiece != null) {
                 if(currentPiece.getColor() != kingColor) {

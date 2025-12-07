@@ -8,26 +8,22 @@ public class Knight extends Piece{
     }
 
     @Override
-    public List<Move> calculateLegalMoves(Board board, Square from) {
+    public List<Move> calculateLegalMoves(BoardView board, Square from) {
         List<Move> legalMoves = new ArrayList<>();
-
-        Piece piece = board.getPiece(from);
-        if (!(piece instanceof Knight)) return legalMoves;
-        Knight knight = (Knight)piece;
-        Color knightColor = knight.getColor();
+        Color knightColor = this.getColor();
 
         int[][] directions = { {2, -1}, {2, 1}, {-2, -1}, {-2, 1}, {1, -2}, {1, 2}, {-1, -2}, {-1, 2} };
 
         for (int[] dir : directions) {
-            int row = from.row() + dir[0];
-            int col = from.col() + dir[1];
-            Square to = new Square(row, col);
+            int row = from.getRow() + dir[0];
+            int col = from.getCol() + dir[1];
+            Square to = board.getSquare(row, col);
 
-            if(!board.isValidSquare(to)){
+            if(!board.isValidSquare(row, col)){
                 continue;
             }
 
-            Piece currentPiece = board.getPiece(to);
+            Piece currentPiece = board.getSquare(row, col).getPiece();
             Move move = new Move(from, to);
 
             if(currentPiece == null) {

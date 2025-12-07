@@ -8,23 +8,20 @@ public class Queen extends Piece{
     }
 
     @Override
-    public List<Move> calculateLegalMoves(Board board, Square from) {
+    public List<Move> calculateLegalMoves(BoardView board, Square from) {
         List<Move> legalMoves = new ArrayList<>();
 
-        Piece piece = board.getPiece(from);
-        if (!(piece instanceof Queen)) return legalMoves;
-        Queen queen = (Queen)piece;
-        Color queenColor = queen.getColor();
+        Color queenColor = this.getColor();
 
         int[][] directions = { {0, -1}, {0, 1}, {-1, 0}, {1, 0}, {1, -1}, {1, 1}, {-1, 1}, {-1, -1} };
 
         for (int[] dir : directions) {
-            int row = from.row() + dir[0];
-            int col = from.col() + dir[1];
+            int row = from.getRow() + dir[0];
+            int col = from.getCol() + dir[1];
 
-            while (board.isValidSquare(new Square(row, col))) {
-                Piece currentPiece = board.getPiece(new Square(row, col));
-                Square to = new Square(row, col);
+            while (board.isValidSquare(row, col)) {
+                Square to = board.getSquare(row, col);
+                Piece currentPiece = to.getPiece();
                 Move move = new Move(from, to);
 
                 if(currentPiece == null) {

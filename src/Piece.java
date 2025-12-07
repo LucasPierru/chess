@@ -2,35 +2,28 @@ import java.util.List;
 
 public abstract class Piece {
     private String name;
+    private int value;
     protected Color color;
+    private final String[] LETTERS = {"a", "b", "c", "d", "e", "f", "g", "h"};
 
     public Piece(Color color){
         this.color = color;
     }
 
-    public void move(Board board, Square from, Square to) throws IllegalMoveException {
-        Piece piece = board.getPiece(from);
-
-        if (piece == null) {
-            throw new IllegalMoveException("No piece at " + from);
-        }
-
+    /*public boolean isCheckingKing(Board board, Square from) {
+        Square kingSquare = board.getKingPosition(color == Color.WHITE ? Color.BLACK : Color.WHITE);
         List<Move> legalMoves = this.calculateLegalMoves(board, from);
 
         for (Move move: legalMoves) {
-            if (move.to().equals(to)) {
-                board.setPiece(to, piece);
-                board.setPiece(from, null);
-                board.switchSide();
-                return;
+            if (move.to().equals(kingSquare)) {
+                return true;
             }
         }
 
-        throw new IllegalMoveException("Illegal move: " + piece.getClass().getSimpleName()
-                + " cannot move from " + from + " to " + to);
-    }
+        return false;
+    }*/
 
-    public abstract List<Move> calculateLegalMoves(Board board, Square from);
+    public abstract List<Move> calculateLegalMoves(BoardView board, Square from);
 
     public String getName() {
         return name;
@@ -46,5 +39,13 @@ public abstract class Piece {
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public int getValue() {
+        return this.value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
     }
 }
