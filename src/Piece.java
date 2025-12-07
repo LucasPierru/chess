@@ -1,5 +1,3 @@
-import java.util.List;
-
 public abstract class Piece {
     private String name;
     private int value;
@@ -22,8 +20,6 @@ public abstract class Piece {
 
         return false;
     }*/
-
-    public abstract List<Move> calculateLegalMoves(BoardView board, Square from);
 
     public String getName() {
         return name;

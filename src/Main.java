@@ -5,14 +5,16 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         Board board = new Board();
+        MoveGenerator moveGenerator = new MoveGenerator(board);
         board.print();
         System.out.println(board.getSideToMove() + " to move");
-        Square from = board.getSquare(1, 4);
-        Piece piece = from.getPiece();
-        List<Move> legalMoves = piece.calculateLegalMoves(board, from);
+        Square from = new Square(1, 4);
+        Square to = new Square(3, 4);
+        Piece piece = board.getPiece(1, 4);
+        List<Move> legalMoves = moveGenerator.legalMoves(from);
         System.out.println(legalMoves + " " + piece.getColor() + "-" + piece.getName() + " has " + legalMoves.size() + " Moves available");
         try {
-            board.movePiece(from, board.getSquare(3,4));
+            moveGenerator.movePiece(from, to);
         } catch (IllegalMoveException e) {
             System.out.println("⚠️ " + e.getMessage());
         }
