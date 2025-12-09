@@ -1,4 +1,4 @@
-public class Board implements BoardView {
+public class Board implements Cloneable  {
     private Piece[][] board = new Piece[8][8];
     private Color sideToMove = Color.WHITE;
     private final String[] letters = {"a", "b", "c", "d", "e", "f", "g", "h"};
@@ -62,87 +62,6 @@ public class Board implements BoardView {
             }
         }
         return null;
-    }
-
-    public boolean isSquareAttacked(Square to, Color pieceColor) {
-        //check for pawn
-        int[] pawnCaptureDirections = {-1, 1};
-        int colorDirection = pieceColor == Color.WHITE ? 1 : -1;
-
-        for (int direction : pawnCaptureDirections){
-            if(this.isValidSquare(to.getRow() +  colorDirection, to.getCol() + direction)) {
-                Piece piece = this.getPiece(to.getRow() +  colorDirection, to.getCol() + direction);
-                if(piece instanceof Pawn && piece.getColor() != pieceColor) {
-                    return true;
-                }
-            }
-        }
-
-        //check for knight
-        int[][] knightCaptureDirections = { {2, -1}, {2, 1}, {-2, -1}, {-2, 1}, {1, -2}, {1, 2}, {-1, -2}, {-1, 2} };
-        for (int[] direction : knightCaptureDirections){
-            if(this.isValidSquare(to.getRow() +  direction[0], to.getCol() + direction[1])) {
-                Piece piece = this.getPiece(to.getRow() +  direction[0], to.getCol() + direction[1]);
-                if(piece instanceof Knight && piece.getColor() != pieceColor) {
-                    return true;
-                }
-            }
-        }
-
-        //check for bishop/queen
-        int[][] bishopCaptureDirections = { {1, 1}, {1, -1}, {-1, -1}, {-1, 1} };
-        for (int[] direction : bishopCaptureDirections){
-            int row = to.getRow() + direction[0];
-            int col = to.getCol() + direction[1];
-
-            while (this.isValidSquare(row, col)) {
-                Piece piece = this.getPiece(row, col);
-                if((piece instanceof Queen || piece instanceof Bishop) && piece.getColor() != pieceColor) {
-                    return true;
-                }
-
-                if(piece != null && ((!(piece instanceof Queen) && !(piece instanceof Bishop)) || piece.getColor() == pieceColor)) {
-                    break;
-                }
-
-                row += direction[0];
-                col += direction[1];
-            }
-        }
-
-        //check for rook/queen
-        int[][] rookCaptureDirections = { {1, 0}, {0, -1}, {-1, 0}, {0, 1} };
-        for (int[] direction : rookCaptureDirections){
-            int row = to.getRow() + direction[0];
-            int col = to.getCol() + direction[1];
-
-            while (this.isValidSquare(row, col)) {
-                Piece piece = this.getPiece(row, col);
-                if((piece instanceof Queen || piece instanceof Rook) && piece.getColor() != pieceColor) {
-                    return true;
-                }
-
-                if(piece != null && ((!(piece instanceof Queen) && !(piece instanceof Rook)) || piece.getColor() == pieceColor)) {
-                    break;
-                }
-
-                row += direction[0];
-                col += direction[1];
-            }
-        }
-
-        //check for king
-        int[][] kingCaptureDirections = { {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1} };
-        for (int[] direction : kingCaptureDirections){
-            if(this.isValidSquare(to.getRow() +  direction[0], to.getCol() + direction[1])) {
-                Piece piece = this.getPiece(to.getRow() +  direction[0], to.getCol() + direction[1]);
-                if(piece instanceof King && piece.getColor() != pieceColor) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     public void initializeBoard() {
@@ -209,5 +128,8 @@ public class Board implements BoardView {
         System.out.println();
     }
 
-
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }

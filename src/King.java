@@ -1,13 +1,17 @@
 public class King extends Piece{
+    private boolean hasCastleRights;
+
     public King(Color color) {
         super(color);
         this.setName("K");
+        this.hasCastleRights = true;
     }
 
-    private boolean isKingInCheck(BoardView board, Square to) {
-        Square kingPosition = board.getKingPosition(this.getColor());
-        return board.isSquareAttacked(kingPosition, this.getColor());
+    public boolean getHasCastleRights() {
+        return hasCastleRights;
     }
 
-
+    public void setHasCastleRights(boolean hasCastleRights) {
+        this.hasCastleRights = hasCastleRights;
+    }
 }

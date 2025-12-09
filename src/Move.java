@@ -4,11 +4,14 @@ public final class Move {
     public final Square from;
     public final Square to;
     public final PieceType promotion;
+    public final Piece piece;
+    private final String[] LETTERS = {"a", "b", "c", "d", "e", "f", "g", "h"};
 
-    public Move(Square from, Square to) {
+    public Move(Square from, Square to, Piece piece) {
         this.from = from;
         this.to = to;
         this.promotion = null;
+        this.piece = piece;
     }
 
     public Square getFrom() {
@@ -30,5 +33,9 @@ public final class Move {
     @Override
     public int hashCode() {
         return Objects.hash(from, to, promotion);
+    }
+
+    public String translateMoveToNotation() {
+        return (piece.getName() == "P" ? "" : piece.getName()) + this.LETTERS[to.getCol()] + (to.getRow() + 1);
     }
 }

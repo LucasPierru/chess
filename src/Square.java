@@ -3,6 +3,7 @@ import java.util.Objects;
 public class Square {
     private int col;
     private int row;
+    private final String[] LETTERS = {"a", "b", "c", "d", "e", "f", "g", "h"};
 
     public Square(int row, int col){
         this.row = row;
@@ -36,5 +37,9 @@ public class Square {
     @Override
     public int hashCode() {
         return Objects.hash(col, row);
+    }
+
+    public String translateMoveToNotation() {
+        return this.LETTERS[col] + (row + 1);
     }
 }
