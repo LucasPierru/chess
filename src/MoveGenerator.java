@@ -206,14 +206,14 @@ public final class MoveGenerator {
             }
         }
 
-        /*King king = (King)piece;
+        King king = (King)piece;
         Square firstSquare = new Square(from.getRow(), from.getCol() + 1);
         Square secondSquare = new Square(from.getRow(), from.getCol() + 2);
         Piece firstPiece = board.getPiece(firstSquare.getRow(), firstSquare.getCol());
         Piece secondPiece = board.getPiece(secondSquare.getRow(), secondSquare.getCol());
         Piece rook = board.getPiece(from.getRow(), from.getCol() + 3);
 
-        if (king.getHasCastleRights()
+        if (king.getHasShortCastleRights()
                 && !isSquareAttacked(from, kingColor)
                 && !isSquareAttacked(firstSquare, kingColor)
                 && !isSquareAttacked(secondSquare, kingColor)
@@ -221,8 +221,25 @@ public final class MoveGenerator {
                 && secondPiece == null
                 && (rook instanceof Rook)
         ) {
+            legalMoves.add(new Move(from, secondSquare, MoveType.CASTLING, king));
+        }
 
-        }*/
+        Square longFirstSquare = new Square(from.getRow(), from.getCol() - 1);
+        Square longSecondSquare = new Square(from.getRow(), from.getCol() - 2);
+        Piece longFirstPiece = board.getPiece(longFirstSquare.getRow(), longFirstSquare.getCol());
+        Piece longSecondPiecePiece = board.getPiece(longSecondSquare.getRow(), longSecondSquare.getCol());
+        Piece rookLong = board.getPiece(from.getRow(), from.getCol() - 4);
+
+        if (king.getHasLongCastleRights()
+                && !isSquareAttacked(from, kingColor)
+                && !isSquareAttacked(longFirstSquare, kingColor)
+                && !isSquareAttacked(longSecondSquare, kingColor)
+                && longFirstPiece == null
+                && longSecondPiecePiece == null
+                && (rookLong instanceof Rook)
+        ) {
+            legalMoves.add(new Move(from, longSecondSquare, MoveType.CASTLING, king));
+        }
 
         return legalMoves;
     }

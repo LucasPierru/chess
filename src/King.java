@@ -1,17 +1,27 @@
 public class King extends Piece{
-    private boolean hasCastleRights;
+    private boolean hasShortCastleRights;
+    private boolean hasLongCastleRights;
 
     public King(Color color) {
         super(color);
         this.setName("K");
-        this.hasCastleRights = true;
+        this.hasShortCastleRights = true;
+        this.hasLongCastleRights = true;
     }
 
-    public boolean getHasCastleRights() {
-        return hasCastleRights;
+    public boolean getHasShortCastleRights() {
+        return hasShortCastleRights;
     }
 
-    public void setHasCastleRights(boolean hasCastleRights) {
-        this.hasCastleRights = hasCastleRights;
+    public void setHasShortCastleRights(boolean hasCastleRights) {
+        this.hasShortCastleRights = hasCastleRights;
+    }
+
+    public boolean getHasLongCastleRights() {
+        return hasLongCastleRights;
+    }
+
+    public void setHasLongCastleRights(boolean hasLongCastleRights) {
+        this.hasLongCastleRights = hasLongCastleRights;
     }
 }

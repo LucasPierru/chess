@@ -3,6 +3,7 @@ import java.util.Objects;
 public final class Move {
     public final Square from;
     public final Square to;
+    public final MoveType moveType;
     public final PieceType promotion;
     public final Piece piece;
     private final String[] LETTERS = {"a", "b", "c", "d", "e", "f", "g", "h"};
@@ -10,6 +11,15 @@ public final class Move {
     public Move(Square from, Square to, Piece piece) {
         this.from = from;
         this.to = to;
+        this.moveType = MoveType.NORMAL;
+        this.promotion = null;
+        this.piece = piece;
+    }
+
+    public Move(Square from, Square to, MoveType moveType, Piece piece) {
+        this.from = from;
+        this.to = to;
+        this.moveType = moveType;
         this.promotion = null;
         this.piece = piece;
     }

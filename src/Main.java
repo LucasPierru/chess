@@ -14,15 +14,15 @@ public class Main {
         List<Move> legalMoves = moveGenerator.legalMoves(from);
         System.out.println(legalMoves + " " + piece.getColor() + "-" + piece.getName() + " has " + legalMoves.size() + " Moves available");
         try {
-            moveGenerator.movePiece(from, to);
+            moveGenerator.movePiece(new Square("e2"), new Square("e4" ));
             board.print();
-            moveGenerator.movePiece(new Square(6, 4), new Square(4,4 ));
+            moveGenerator.movePiece(new Square("e7"), new Square("e5" ));
             board.print();
-            moveGenerator.movePiece(new Square(1, 5), new Square(3,5 ));
+            moveGenerator.movePiece(new Square("f2"), new Square("f4"));
             board.print();
-            moveGenerator.movePiece(new Square(7, 3), new Square(3, 7));
+            moveGenerator.movePiece(new Square("b8"), new Square("c6"));
             board.print();
-            moveGenerator.movePiece(new Square(0, 1), new Square(2, 3));
+            moveGenerator.movePiece(new Square("g1"), new Square("f3"));
             board.print();
         } catch (IllegalMoveException e) {
             System.out.println("⚠️ " + e.getMessage());
@@ -38,7 +38,7 @@ public class Main {
                 System.out.println(move.translateMoveToNotation() + ";");
             }
         }
-
+        System.out.println("");
         System.out.println(board.getSideToMove() + " to move");
     }
 }
