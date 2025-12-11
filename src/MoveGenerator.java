@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiPredicate;
 
 public final class MoveGenerator {
     private static Board board;
@@ -97,41 +98,67 @@ public final class MoveGenerator {
     }
 
     public void movePiece(Square from, Square to) throws IllegalMoveException, CloneNotSupportedException {
-        Piece piece = board.getPiece(from.getRow(), from.getCol());
+        Piece piece = this.board.getPiece(from.getRow(), from.getCol());
 
         if (piece == null) {
-            throw new IllegalMoveException("No piece at " + from.translateMoveToNotation());
+            throw new IllegalMoveException("No piece at " + from.translateSquareToNotation());
         }
 
         List<Move> legalMoves = this.legalMoves(from);
         boolean isLegal = false;
-        Board newBoard = (Board)board.clone();
-        boolean isKingInCheck = isKingInCheck(newBoard, newBoard.getSideToMove());
         Move selectedMove = null;
+        boolean isKingInCheck = isKingInCheck(this.board, this.board.getSideToMove());
 
         for (Move move: legalMoves) {
-            if (move.getTo().equals(to)) {
-                newBoard.setPiece(to.getRow(), to.getCol(), piece);
-                newBoard.setPiece(from.getRow(), from.getCol(), null);
+            if (!move.getTo().equals(to)) continue;
+
+            Board testBoard = this.board.deepCopy();
+            applyMoveToBoardForValidation(testBoard, move);
+
+            boolean kingInCheckAfter = isKingInCheck(testBoard, testBoard.getSideToMove());
+            if (!kingInCheckAfter) {
+                isLegal = true;
                 selectedMove = move;
-                isLegal = !isKingInCheck(newBoard, newBoard.getSideToMove());
+                break;
             }
         }
 
         if(isLegal) {
-            board.setPiece(to.getRow(), to.getCol(), piece);
-            board.setPiece(from.getRow(), from.getCol(), null);
+            applyMoveToBoardForValidation(this.board, selectedMove);
             this.addMoveToHistory(selectedMove);
-            board.switchSide();
+            this.board.switchSide();
         } else {
             if (isKingInCheck) {
                 throw new IllegalMoveException("Illegal move: " + piece.getClass().getSimpleName()
-                        + " cannot move from " + from.translateMoveToNotation() + " to " + to.translateMoveToNotation() + " Your king is in check");
+                        + " cannot move from " + from.translateSquareToNotation() + " to " + to.translateSquareToNotation() + " Your king is in check");
             }
             throw new IllegalMoveException("Illegal move: " + piece.getClass().getSimpleName()
-                    + " cannot move from " + from.translateMoveToNotation() + " to " + to.translateMoveToNotation());
+                    + " cannot move from " + from.translateSquareToNotation() + " to " + to.translateSquareToNotation());
         }
 
+    }
+
+    private void applyMoveToBoardForValidation(Board boardToUse, Move move) {
+        Square to = move.getTo();
+        Square from = move.getFrom();
+        Piece moving = boardToUse.getPiece(from.getRow(), from.getCol());
+
+        boardToUse.setPiece(to.getRow(), to.getCol(), moving);
+        boardToUse.setPiece(from.getRow(), from.getCol(), null);
+        if (move.getMoveType() == MoveType.CASTLING) {
+            if (to.getCol() - from.getCol() == 2) {
+                Rook rook = (Rook)board.getPiece(to.getRow(),7);
+                boardToUse.setPiece(to.getRow(), 5, rook);
+                boardToUse.setPiece(to.getRow(), 7, null);
+                ((King) moving).setHasShortCastleRights(false);
+            }
+            if (from.getCol() - to.getCol() == 3) {
+                Rook rook = (Rook)board.getPiece(to.getRow(),0);
+                boardToUse.setPiece(to.getRow(), 3, rook);
+                boardToUse.setPiece(to.getRow(), 0, null);
+                ((King) moving).setHasLongCastleRights(false);
+            }
+        }
     }
 
     public List<Move> legalMoves(Square from) {
@@ -181,6 +208,9 @@ public final class MoveGenerator {
     private List<Move> generateKingMoves(Square from) {
         List<Move> legalMoves = new ArrayList<>();
         Piece piece = board.getPiece(from.getRow(), from.getCol());
+
+        if (piece == null || !(piece instanceof King)) return legalMoves;
+
         Color kingColor = piece.getColor();
 
         int[][] directions = { {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1} };
@@ -190,55 +220,57 @@ public final class MoveGenerator {
             int col = from.getCol() + dir[1];
             Square to = new Square(row, col);
 
-            if(!board.isValidSquare(row, col)){
-                continue;
-            }
+            if(!board.isValidSquare(row, col)) continue;
 
             Piece currentPiece = board.getPiece(row, col);
-            Move move = new Move(from, to, piece);
+            boolean isCapture = currentPiece != null && currentPiece.getColor() != kingColor;
 
-            if(currentPiece == null && !isSquareAttacked(to, kingColor)) {
-                legalMoves.add(move);
-            } else if(currentPiece != null) {
-                if(currentPiece.getColor() != kingColor) {
-                    legalMoves.add(move);
-                }
+            if((currentPiece == null || isCapture) && !isSquareAttacked(to, kingColor)) {
+                legalMoves.add(new Move(from, to, piece));
             }
         }
 
         King king = (King)piece;
-        Square firstSquare = new Square(from.getRow(), from.getCol() + 1);
-        Square secondSquare = new Square(from.getRow(), from.getCol() + 2);
-        Piece firstPiece = board.getPiece(firstSquare.getRow(), firstSquare.getCol());
-        Piece secondPiece = board.getPiece(secondSquare.getRow(), secondSquare.getCol());
-        Piece rook = board.getPiece(from.getRow(), from.getCol() + 3);
+        int row = from.getRow();
+        int col = from.getCol();
 
-        if (king.getHasShortCastleRights()
-                && !isSquareAttacked(from, kingColor)
-                && !isSquareAttacked(firstSquare, kingColor)
-                && !isSquareAttacked(secondSquare, kingColor)
-                && firstPiece == null
-                && secondPiece == null
-                && (rook instanceof Rook)
-        ) {
-            legalMoves.add(new Move(from, secondSquare, MoveType.CASTLING, king));
+        BiPredicate<Integer, Piece> rookAt = (file, p) -> {
+            if (!board.isValidSquare(row, file)) return false;
+            Piece candidate = board.getPiece(row, file);
+            return (candidate instanceof Rook) && candidate.getColor() == kingColor;
+        };
+
+        if (king.getHasShortCastleRights()) {
+            int f1 = col + 1;
+            int f2 = col + 2;
+            int rookFile = col + 3;
+            if(board.isValidSquare(row, f1) && board.isValidSquare(row, f2) && board.isValidSquare(row, rookFile)) {
+                if(board.getPiece(row, f1) == null && board.getPiece(row, f2) == null
+                        && rookAt.test(rookFile, null)
+                        && !isSquareAttacked(from, kingColor)
+                        && !isSquareAttacked(new Square(row, f1), kingColor)
+                        && !isSquareAttacked(new Square(row, f2), kingColor)
+                ) {
+                    legalMoves.add(new Move(from, new Square(row, f2), MoveType.CASTLING, king));
+                }
+            }
         }
 
-        Square longFirstSquare = new Square(from.getRow(), from.getCol() - 1);
-        Square longSecondSquare = new Square(from.getRow(), from.getCol() - 2);
-        Piece longFirstPiece = board.getPiece(longFirstSquare.getRow(), longFirstSquare.getCol());
-        Piece longSecondPiecePiece = board.getPiece(longSecondSquare.getRow(), longSecondSquare.getCol());
-        Piece rookLong = board.getPiece(from.getRow(), from.getCol() - 4);
-
-        if (king.getHasLongCastleRights()
-                && !isSquareAttacked(from, kingColor)
-                && !isSquareAttacked(longFirstSquare, kingColor)
-                && !isSquareAttacked(longSecondSquare, kingColor)
-                && longFirstPiece == null
-                && longSecondPiecePiece == null
-                && (rookLong instanceof Rook)
-        ) {
-            legalMoves.add(new Move(from, longSecondSquare, MoveType.CASTLING, king));
+        if (king.getHasLongCastleRights()) {
+            int f1 = col - 1;
+            int f2 = col - 2;
+            int f3 = col - 3;
+            int rookFile = col - 4;
+            if(board.isValidSquare(row, f1) && board.isValidSquare(row, f2) && board.isValidSquare(row, f3) && board.isValidSquare(row, rookFile)) {
+                if(board.getPiece(row, f1) == null && board.getPiece(row, f2) == null && board.getPiece(row, f3) == null
+                        && rookAt.test(rookFile, null)
+                        && !isSquareAttacked(from, kingColor)
+                        && !isSquareAttacked(new Square(row, f1), kingColor)
+                        && !isSquareAttacked(new Square(row, f2), kingColor)
+                ) {
+                    legalMoves.add(new Move(from, new Square(row, f2), MoveType.CASTLING, king));
+                }
+            }
         }
 
         return legalMoves;

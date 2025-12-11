@@ -1,11 +1,11 @@
 import java.util.Objects;
 
 public final class Move {
-    public final Square from;
-    public final Square to;
-    public final MoveType moveType;
-    public final PieceType promotion;
-    public final Piece piece;
+    private final Square from;
+    private final Square to;
+    private final MoveType moveType;
+    private final PieceType promotion;
+    private final Piece piece;
     private final String[] LETTERS = {"a", "b", "c", "d", "e", "f", "g", "h"};
 
     public Move(Square from, Square to, Piece piece) {
@@ -32,6 +32,14 @@ public final class Move {
         return to;
     }
 
+    public MoveType getMoveType() {
+        return moveType;
+    }
+
+    public Piece getPiece() {
+        return piece;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -46,6 +54,10 @@ public final class Move {
     }
 
     public String translateMoveToNotation() {
-        return (piece.getName() == "P" ? "" : piece.getName()) + this.LETTERS[to.getCol()] + (to.getRow() + 1);
+        switch (getMoveType()) {
+            case MoveType.NORMAL : return (piece.getName() == "P" ? "" : piece.getName()) + this.LETTERS[to.getCol()] + (to.getRow() + 1);
+            case MoveType.CASTLING: return "O-O";
+            default: return "";
+        }
     }
 }

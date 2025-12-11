@@ -132,4 +132,31 @@ public class Board implements Cloneable  {
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
+
+    public Board deepCopy() {
+        Board copy = new Board();
+
+        // deep copy the 2D piece array
+        for (int r = 0; r < 8; r++) {
+            // clone the row array so rows don't share references
+            copy.board[r] = new Piece[8];
+            for (int f = 0; f < 8; f++) {
+                Piece p = this.board[r][f];
+                if (p == null) {
+                    copy.board[r][f] = null;
+                } else {
+                    // If Piece is immutable you can reuse the reference:
+                    copy.board[r][f] = p;
+
+                    // If Piece is mutable, replace the previous line with something like:
+                    // copy.board[r][f] = p.clone(); // or new Piece(p) if you have a copy constructor
+                }
+            }
+        }
+
+        // primitive or immutable fields: copy directly
+        copy.sideToMove = this.sideToMove;
+
+        return copy;
+    }
 }

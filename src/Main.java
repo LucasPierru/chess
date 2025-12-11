@@ -9,10 +9,9 @@ public class Main {
         board.print();
         System.out.println(board.getSideToMove() + " to move");
         Square from = new Square(1, 4);
-        Square to = new Square(3, 4);
         Piece piece = board.getPiece(1, 4);
-        List<Move> legalMoves = moveGenerator.legalMoves(from);
-        System.out.println(legalMoves + " " + piece.getColor() + "-" + piece.getName() + " has " + legalMoves.size() + " Moves available");
+        /*List<Move> legalMoves = moveGenerator.legalMoves(from);
+        System.out.println(legalMoves + " " + piece.getColor() + "-" + piece.getName() + " has " + legalMoves.size() + " Moves available");*/
         try {
             moveGenerator.movePiece(new Square("e2"), new Square("e4" ));
             board.print();
@@ -23,6 +22,14 @@ public class Main {
             moveGenerator.movePiece(new Square("b8"), new Square("c6"));
             board.print();
             moveGenerator.movePiece(new Square("g1"), new Square("f3"));
+            board.print();
+            moveGenerator.movePiece(new Square("g8"), new Square("f6"));
+            board.print();
+            moveGenerator.movePiece(new Square("f1"), new Square("b5"));
+            board.print();
+            moveGenerator.movePiece(new Square("a7"), new Square("a6"));
+            board.print();
+            moveGenerator.movePiece(new Square("e1"), new Square("g1"));
             board.print();
         } catch (IllegalMoveException e) {
             System.out.println("⚠️ " + e.getMessage());
@@ -38,6 +45,14 @@ public class Main {
                 System.out.println(move.translateMoveToNotation() + ";");
             }
         }
+
+        System.out.println("");
+        List<Move> legalMoves = moveGenerator.legalMoves(board.getKingPosition(Color.WHITE));
+
+        for (Move move: legalMoves){
+            System.out.println(move.getPiece().getName() + " can move from " + move.getFrom().translateSquareToNotation() + " to " + move.getTo().translateSquareToNotation());
+        }
+
         System.out.println("");
         System.out.println(board.getSideToMove() + " to move");
     }

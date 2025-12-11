@@ -53,7 +53,7 @@ public class Square {
         return Objects.hash(col, row);
     }
 
-    public String translateMoveToNotation() {
+    public String translateSquareToNotation() {
         return "" + this.LETTERS[col] + (row + 1);
     }
 
