@@ -391,8 +391,30 @@ public final class MoveGenerator {
             }
         }
 
-        Square rightCapture = new Square(from.getRow() + direction,from.getCol() + 1);
+        int[] captureDir = {-1, 1};
+        Move lastMove = moveHistory.size() > 0 ? moveHistory.getLast() : null;
+
+        for (int dir : captureDir) {
+            Square capture = new Square(from.getRow() + direction,from.getCol() + dir);
+            // Piece nextToPiece = board.getPiece(from.getRow(),from.getCol() + dir);
+
+            boolean canEnPassant = lastMove != null && lastMove.getPiece() instanceof Pawn
+                    && Math.abs(lastMove.getFrom().getRow() - lastMove.getTo().getRow()) == 2
+                    && lastMove.getPiece().getColor() != piece.getColor() && lastMove.getTo().getCol() == from.getCol() + dir;
+
+            boolean isSquareValid = board.isValidSquare(from.getRow(), from.getCol() + dir);
+
+            if(isSquareValid && (board.getPiece(from.getRow() + direction,from.getCol() + dir) != null)) {
+                legalMoves.add(new Move(from, capture, piece));
+            }
+            if(isSquareValid && canEnPassant) {
+                legalMoves.add(new Move(from, capture, MoveType.EN_PASSANT, piece));
+            }
+        }
+
+        /*Square rightCapture = new Square(from.getRow() + direction,from.getCol() + 1);
         Square leftCapture = new Square(from.getRow() + direction, from.getCol() - 1);
+
 
         if(from.getCol() < 7 && board.getPiece(from.getRow() + direction,from.getCol() + 1) != null) {
             legalMoves.add(new Move(from, rightCapture, piece));
@@ -400,7 +422,7 @@ public final class MoveGenerator {
 
         if(from.getCol() > 0 && board.getPiece(from.getRow() + direction, from.getCol() - 1) != null) {
             legalMoves.add(new Move(from, leftCapture, piece));
-        }
+        }*/
 
         return legalMoves;
     }
