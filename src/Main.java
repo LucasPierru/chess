@@ -21,6 +21,8 @@ public class Main {
             board.print();
             moveGenerator.movePiece(new Square("f7"), new Square("f5" ));
             board.print();
+            moveGenerator.movePiece(new Square("e5"), new Square("f6" ));
+            board.print();
             /*moveGenerator.movePiece(new Square("e7"), new Square("e5" ));
             board.print();
             moveGenerator.movePiece(new Square("f2"), new Square("f4"));
@@ -54,7 +56,7 @@ public class Main {
 
         System.out.println("");
         try {
-            Square pawnSquare = new Square("b2");
+            Square pawnSquare = new Square("e5");
             List<Move> legalMoves = moveGenerator.legalMoves(pawnSquare);
             for (Move move: legalMoves){
                 System.out.println(move.getPiece().getName() + " can move from " + move.getFrom().translateSquareToNotation() + " to " + move.getTo().translateSquareToNotation() + " " + move.getMoveType());

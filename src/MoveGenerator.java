@@ -159,6 +159,11 @@ public final class MoveGenerator {
                 ((King) moving).setHasLongCastleRights(false);
             }
         }
+
+        if (move.getMoveType() == MoveType.EN_PASSANT) {
+            int dir = move.getPiece().getColor() == Color.WHITE ? 1 : -1;
+            boardToUse.setPiece(to.getRow() - dir, to.getCol(), null);
+        }
     }
 
     public List<Move> legalMoves(Square from) {
