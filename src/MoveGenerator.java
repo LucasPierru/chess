@@ -97,11 +97,15 @@ public final class MoveGenerator {
         return isSquareAttacked(kingPosition, color);
     }
 
-    public void movePiece(Square from, Square to) throws IllegalMoveException, CloneNotSupportedException {
+    public void movePiece(Square from, Square to, PieceType promotion) throws IllegalMoveException, CloneNotSupportedException {
         Piece piece = this.board.getPiece(from.getRow(), from.getCol());
 
         if (piece == null) {
             throw new IllegalMoveException("No piece at " + from.translateSquareToNotation());
+        }
+
+        if(piece.getColor() != board.getSideToMove()) {
+            throw new IllegalMoveException("Illegal Move: " + board.getSideToMove() + " to move");
         }
 
         List<Move> legalMoves = this.legalMoves(from);
@@ -110,7 +114,7 @@ public final class MoveGenerator {
         boolean isKingInCheck = isKingInCheck(this.board, this.board.getSideToMove());
 
         for (Move move: legalMoves) {
-            if (!move.getTo().equals(to)) continue;
+            if (!move.getTo().equals(to) || move.getPromotion() != promotion) continue;
 
             Board testBoard = this.board.deepCopy();
             applyMoveToBoardForValidation(testBoard, move);
@@ -141,10 +145,13 @@ public final class MoveGenerator {
     private void applyMoveToBoardForValidation(Board boardToUse, Move move) {
         Square to = move.getTo();
         Square from = move.getFrom();
-        Piece moving = boardToUse.getPiece(from.getRow(), from.getCol());
+        Piece moving = move.getMoveType() == MoveType.PROMOTION
+                ? getPromotingPiece(move.getPromotion(), move.getPiece().getColor())
+                : boardToUse.getPiece(from.getRow(), from.getCol());
 
         boardToUse.setPiece(to.getRow(), to.getCol(), moving);
         boardToUse.setPiece(from.getRow(), from.getCol(), null);
+
         if (move.getMoveType() == MoveType.CASTLING) {
             if (to.getCol() - from.getCol() == 2) {
                 Rook rook = (Rook)board.getPiece(to.getRow(),7);
@@ -166,9 +173,29 @@ public final class MoveGenerator {
         }
     }
 
+    private Piece getPromotingPiece (PieceType pieceType, Color color) {
+        switch (pieceType) {
+            case PieceType.ROOK -> {
+                return new Rook(color);
+            }
+            case PieceType.BISHOP -> {
+                return new Bishop(color);
+            }
+            case PieceType.QUEEN -> {
+                return new Queen(color);
+            }
+            case PieceType.KNIGHT -> {
+                return new Knight(color);
+            }
+            default -> {
+                return null;
+            }
+        }
+    }
+
     public List<Move> legalMoves(Square from) {
         Piece piece = board.getPiece(from.getRow(), from.getCol());
-        if (piece == null) return List.of();
+        if (piece == null || piece.getColor() != board.getSideToMove()) return List.of();
         switch(piece.getClass().getName()) {
             case "Pawn": return generatePawnMoves(from);
             case "King": return generateKingMoves(from);
@@ -383,25 +410,27 @@ public final class MoveGenerator {
         int direction = pawnColor == Color.WHITE ? 1 : -1;
         int startRow = pawnColor == Color.WHITE ? 1 : 6;
 
-        Square firstSquare = new Square(from.getRow() + direction, from.getCol());
-        Square secondSquare = new Square(from.getRow() + 2 * direction, from.getCol());
+        int[] forwardDir = {1, 2};
 
-        Piece piece1Square = board.getPiece(from.getRow() + direction, from.getCol());
-        Piece piece2Square = board.getPiece(from.getRow() + 2 * direction, from.getCol());
+        for (int dir: forwardDir) {
+            Square forwardSquare = new Square(from.getRow() + dir * direction, from.getCol());
+            Piece forwardPiece = board.getPiece(from.getRow() + dir * direction, from.getCol());
+            MoveType moveType = from.getRow() + direction == 7 || from.getRow() + direction == 0 ? MoveType.PROMOTION : MoveType.NORMAL;
 
-        if(piece1Square == null) {
-            legalMoves.add(new Move(from, firstSquare, piece));
-            if(from.getRow() == startRow && piece2Square == null) {
-                legalMoves.add(new Move(from, secondSquare, piece));
+            if(forwardPiece == null && dir == 1) {
+                getPawnMove(from, legalMoves, piece, forwardSquare, moveType);
+            }
+
+            if(forwardPiece == null && from.getRow() == startRow && dir == 2) {
+                legalMoves.add(new Move(from, forwardSquare, moveType, piece));
             }
         }
 
         int[] captureDir = {-1, 1};
-        Move lastMove = moveHistory.size() > 0 ? moveHistory.getLast() : null;
+        Move lastMove = !moveHistory.isEmpty() ? moveHistory.getLast() : null;
 
         for (int dir : captureDir) {
             Square capture = new Square(from.getRow() + direction,from.getCol() + dir);
-            // Piece nextToPiece = board.getPiece(from.getRow(),from.getCol() + dir);
 
             boolean canEnPassant = lastMove != null && lastMove.getPiece() instanceof Pawn
                     && Math.abs(lastMove.getFrom().getRow() - lastMove.getTo().getRow()) == 2
@@ -410,26 +439,26 @@ public final class MoveGenerator {
             boolean isSquareValid = board.isValidSquare(from.getRow(), from.getCol() + dir);
 
             if(isSquareValid && (board.getPiece(from.getRow() + direction,from.getCol() + dir) != null)) {
-                legalMoves.add(new Move(from, capture, piece));
+                MoveType moveType = from.getRow() + direction == 7 || from.getRow() + direction == 0 ? MoveType.PROMOTION : MoveType.NORMAL;
+                getPawnMove(from, legalMoves, piece, capture, moveType);
             }
             if(isSquareValid && canEnPassant) {
                 legalMoves.add(new Move(from, capture, MoveType.EN_PASSANT, piece));
             }
         }
 
-        /*Square rightCapture = new Square(from.getRow() + direction,from.getCol() + 1);
-        Square leftCapture = new Square(from.getRow() + direction, from.getCol() - 1);
-
-
-        if(from.getCol() < 7 && board.getPiece(from.getRow() + direction,from.getCol() + 1) != null) {
-            legalMoves.add(new Move(from, rightCapture, piece));
-        }
-
-        if(from.getCol() > 0 && board.getPiece(from.getRow() + direction, from.getCol() - 1) != null) {
-            legalMoves.add(new Move(from, leftCapture, piece));
-        }*/
-
         return legalMoves;
+    }
+
+    private void getPawnMove(Square from, List<Move> legalMoves, Piece piece, Square forwardSquare, MoveType moveType) {
+        if(moveType == MoveType.NORMAL) {
+            legalMoves.add(new Move(from, forwardSquare, moveType, piece));
+        } else {
+            legalMoves.add(new Move(from, forwardSquare, moveType, PieceType.BISHOP, piece));
+            legalMoves.add(new Move(from, forwardSquare, moveType, PieceType.QUEEN, piece));
+            legalMoves.add(new Move(from, forwardSquare, moveType, PieceType.KNIGHT, piece));
+            legalMoves.add(new Move(from, forwardSquare, moveType, PieceType.ROOK, piece));
+        }
     }
 
     public List<Move> getMoveHistory() {

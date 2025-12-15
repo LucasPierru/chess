@@ -16,7 +16,7 @@ public class Board implements Cloneable  {
     }
 
     public Piece getPiece(int row, int col) {
-        return this.board[row][col];
+        return this.isValidSquare(row, col) ? this.board[row][col] : null;
     }
 
     public void setPiece(int row, int col, Piece piece) {
@@ -116,7 +116,9 @@ public class Board implements Cloneable  {
                 if(this.board[i][j] == null) {
                     System.out.print("    ");
                 } else {
-                    System.out.print(this.board[i][j].getColor().toString().charAt(0) + "-" + this.board[i][j].getName() + " ");
+                    String ANSI_COLOR = this.board[i][j].getColor() == Color.BLACK ? "\u001B[34m" : "\u001B[0m";
+                    String ANSI_RESET = "\u001B[0m";
+                    System.out.print(ANSI_COLOR + this.board[i][j].getColor().toString().charAt(0) + "-" + this.board[i][j].getName() + " " + ANSI_RESET);
                 }
             }
             System.out.println();

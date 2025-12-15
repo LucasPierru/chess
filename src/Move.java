@@ -4,8 +4,8 @@ public final class Move {
     private final Square from;
     private final Square to;
     private final MoveType moveType;
-    private final PieceType promotion;
     private final Piece piece;
+    private final PieceType promotion;
     private final String[] LETTERS = {"a", "b", "c", "d", "e", "f", "g", "h"};
 
     public Move(Square from, Square to, Piece piece) {
@@ -21,6 +21,14 @@ public final class Move {
         this.to = to;
         this.moveType = moveType;
         this.promotion = null;
+        this.piece = piece;
+    }
+
+    public Move(Square from, Square to, MoveType moveType, PieceType promotion, Piece piece) {
+        this.from = from;
+        this.to = to;
+        this.moveType = moveType;
+        this.promotion = promotion;
         this.piece = piece;
     }
 
@@ -55,9 +63,14 @@ public final class Move {
 
     public String translateMoveToNotation() {
         switch (getMoveType()) {
-            case MoveType.NORMAL : return (piece.getName() == "P" ? "" : piece.getName()) + this.LETTERS[to.getCol()] + (to.getRow() + 1);
+            case MoveType.NORMAL: return (piece.getName() == "P" ? "" : piece.getName()) + this.LETTERS[to.getCol()] + (to.getRow() + 1);
+            case MoveType.EN_PASSANT: return (piece.getName() == "P" ? "" : piece.getName()) + this.LETTERS[to.getCol()] + (to.getRow() + 1);
             case MoveType.CASTLING: return "O-O";
             default: return "";
         }
+    }
+
+    public PieceType getPromotion() {
+        return promotion;
     }
 }
