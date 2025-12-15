@@ -1,3 +1,9 @@
+package move;
+
+import board.Square;
+import piece.Piece;
+import piece.PieceType;
+
 import java.util.Objects;
 
 public final class Move {

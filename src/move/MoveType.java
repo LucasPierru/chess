@@ -1,3 +1,5 @@
+package move;
+
 public enum MoveType {
     NORMAL,
     CASTLING,

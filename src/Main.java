@@ -1,5 +1,12 @@
-import java.util.List;
+import board.Board;
+import board.Square;
+import move.IllegalMoveException;
+import move.Move;
+import move.MoveDto;
+import move.MoveGenerator;
+import piece.PieceType;
 
+import java.util.List;
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {

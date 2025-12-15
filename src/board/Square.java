@@ -1,3 +1,7 @@
+package board;
+
+import move.IllegalMoveException;
+
 import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.stream.IntStream;
@@ -20,7 +24,7 @@ public class Square {
             this.row = row;
             this.col = col.getAsInt();
         } else {
-            throw new IllegalMoveException("Square doesn't exist");
+            throw new IllegalMoveException("board.Square doesn't exist");
         }
     }
 

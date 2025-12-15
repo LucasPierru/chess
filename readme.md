@@ -17,19 +17,19 @@ This project models the core rules of chess (pieces, board, moves, legality chec
 
 ## ✨ Features
 
-* Full board representation (`Board`, `Square`)
+* Full board representation (`board.Board`, `board.Square`)
 * All chess pieces implemented:
-    * King
-    * Queen
-    * Rook
-    * Bishop
-    * Knight
-    * Pawn
+    * piece.King
+    * piece.Queen
+    * piece.Rook
+    * piece.Bishop
+    * piece.Knight
+    * piece.Pawn
 * Centralized **move generation**
-* Move validation and illegal move handling
+* move.Move validation and illegal move handling
 * Explicit modeling of:
-    * Move types
-    * Piece types
+    * move.Move types
+    * piece.Piece types
     * Colors
 * Custom exception for illegal moves
 
@@ -41,22 +41,22 @@ This project models the core rules of chess (pieces, board, moves, legality chec
 chess/
 ├── src/
 │   ├── Main.java              # Application entry point
-│   ├── Board.java             # Board state and game logic
-│   ├── Square.java            # Board squares
-│   ├── Piece.java             # Abstract piece base class
-│   ├── Pawn.java
-│   ├── Rook.java
-│   ├── Knight.java
-│   ├── Bishop.java
-│   ├── Queen.java
-│   ├── King.java
-│   ├── Move.java              # Domain move object
-│   ├── MoveDto.java           # Move data transfer object
-│   ├── MoveGenerator.java     # Legal move generation
-│   ├── MoveType.java          # Enum of move types
-│   ├── PieceType.java         # Enum of piece types
-│   ├── Color.java             # Piece color enum
-│   └── IllegalMoveException.java
+│   ├── board.Board.java             # board.Board state and game logic
+│   ├── board.Square.java            # board.Board squares
+│   ├── piece.Piece.java             # Abstract piece base class
+│   ├── piece.Pawn.java
+│   ├── piece.Rook.java
+│   ├── piece.Knight.java
+│   ├── piece.Bishop.java
+│   ├── piece.Queen.java
+│   ├── piece.King.java
+│   ├── piece.PieceType.java         # Enum of piece types
+│   ├── piece.Color.java             # piece.Piece color enum
+│   ├── move.Move.java              # Domain move object
+│   ├── move.MoveDto.java           # move.Move data transfer object
+│   ├── move.MoveGenerator.java     # Legal move generation
+│   ├── move.MoveType.java          # Enum of move types
+│   └── move.IllegalMoveException.java
 ├── .gitignore
 ├── chess.iml
 └── README.md
@@ -97,25 +97,25 @@ Or simply run `Main.java` from your IDE.
 
 ## 🧩 Design Overview
 
-### Board & Squares
+### board.Board & Squares
 
-* `Board` owns the state of the game
-* `Board` contains an 8x8 array of `Piece`
+* `board.Board` owns the state of the game
+* `board.Board` contains an 8x8 array of `piece.Piece`
 
 ### Pieces
 
-* All pieces extend the abstract `Piece` class
-* Piece-specific movement logic is encapsulated per class
+* All pieces extend the abstract `piece.Piece` class
+* piece.Piece-specific movement logic is encapsulated per class
 
-### Move Generation
+### move.Move Generation
 
-* `MoveGenerator` computes and validates **legal moves**
-* `Move` represents a validated domain action
-* `MoveDto` can be used for UI / external input
+* `move.MoveGenerator` computes and validates **legal moves**
+* `move.Move` represents a validated domain action
+* `move.MoveDto` can be used for UI / external input
 
 ### Error Handling
 
-* `IllegalMoveException` is thrown when invalid moves are attempted
+* `move.IllegalMoveException` is thrown when invalid moves are attempted
 
 ---
 

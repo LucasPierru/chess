@@ -1,5 +1,9 @@
+package board;
+
+import piece.*;
+
 public class Board implements Cloneable  {
-    private Piece[][] board = new Piece[8][8];
+    private piece.Piece[][] board = new piece.Piece[8][8];
     private Color sideToMove = Color.WHITE;
     private final String[] letters = {"a", "b", "c", "d", "e", "f", "g", "h"};
 
@@ -7,7 +11,7 @@ public class Board implements Cloneable  {
         this.initializeBoard();
     }
 
-    public Piece[][] getBoard() {
+    public piece.Piece[][] getBoard() {
         return board;
     }
 
@@ -15,7 +19,7 @@ public class Board implements Cloneable  {
         this.board = board;
     }
 
-    public Piece getPiece(int row, int col) {
+    public piece.Piece getPiece(int row, int col) {
         return this.isValidSquare(row, col) ? this.board[row][col] : null;
     }
 
@@ -41,8 +45,8 @@ public class Board implements Cloneable  {
     }
 
     public King getKing(Color pieceColor) {
-        for (Piece[] rows : this.board) {
-            for (Piece piece: rows){
+        for (piece.Piece[] rows : this.board) {
+            for (piece.Piece piece: rows){
                 if (piece instanceof King && piece.getColor() == pieceColor) {
                     return (King)piece;
                 }
@@ -55,7 +59,7 @@ public class Board implements Cloneable  {
         Piece[][] pieces = this.board;
         for (int i = 0; i < pieces.length; i++) {
             for (int j = 0; j < pieces[i].length; j++){
-                Piece piece = pieces[i][j];
+                piece.Piece piece = pieces[i][j];
                 if (piece instanceof King && piece.getColor() == pieceColor) {
                     return new Square(i, j);
                 }
@@ -141,17 +145,17 @@ public class Board implements Cloneable  {
         // deep copy the 2D piece array
         for (int r = 0; r < 8; r++) {
             // clone the row array so rows don't share references
-            copy.board[r] = new Piece[8];
+            copy.board[r] = new piece.Piece[8];
             for (int f = 0; f < 8; f++) {
-                Piece p = this.board[r][f];
+                piece.Piece p = this.board[r][f];
                 if (p == null) {
                     copy.board[r][f] = null;
                 } else {
-                    // If Piece is immutable you can reuse the reference:
+                    // If piece.Piece is immutable you can reuse the reference:
                     copy.board[r][f] = p;
 
-                    // If Piece is mutable, replace the previous line with something like:
-                    // copy.board[r][f] = p.clone(); // or new Piece(p) if you have a copy constructor
+                    // If piece.Piece is mutable, replace the previous line with something like:
+                    // copy.board[r][f] = p.clone(); // or new piece.Piece(p) if you have a copy constructor
                 }
             }
         }

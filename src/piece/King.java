@@ -1,4 +1,6 @@
-public class King extends Piece{
+package piece;
+
+public class King extends Piece {
     private boolean hasShortCastleRights;
     private boolean hasLongCastleRights;
 

@@ -1,3 +1,9 @@
+package move;
+
+import board.Board;
+import board.Square;
+import piece.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiPredicate;
@@ -105,7 +111,7 @@ public final class MoveGenerator {
         }
 
         if(piece.getColor() != board.getSideToMove()) {
-            throw new IllegalMoveException("Illegal Move: " + board.getSideToMove() + " to move");
+            throw new IllegalMoveException("Illegal move.Move: " + board.getSideToMove() + " to move");
         }
 
         List<Move> legalMoves = this.legalMoves(from);
@@ -197,12 +203,12 @@ public final class MoveGenerator {
         Piece piece = board.getPiece(from.getRow(), from.getCol());
         if (piece == null || piece.getColor() != board.getSideToMove()) return List.of();
         switch(piece.getClass().getName()) {
-            case "Pawn": return generatePawnMoves(from);
-            case "King": return generateKingMoves(from);
-            case "Queen": return generateQueenMoves(from);
-            case "Bishop": return generateBishopMoves(from);
-            case "Knight": return generateKnightMoves(from);
-            case "Rook": return generateRookMoves(from);
+            case "piece.Pawn": return generatePawnMoves(from);
+            case "piece.King": return generateKingMoves(from);
+            case "piece.Queen": return generateQueenMoves(from);
+            case "piece.Bishop": return generateBishopMoves(from);
+            case "piece.Knight": return generateKnightMoves(from);
+            case "piece.Rook": return generateRookMoves(from);
             default: return List.of();
         }
     }
