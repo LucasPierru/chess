@@ -68,12 +68,12 @@ public final class Move {
     }
 
     public String translateMoveToNotation() {
-        switch (getMoveType()) {
-            case MoveType.NORMAL: return (piece.getName() == "P" ? "" : piece.getName()) + this.LETTERS[to.getCol()] + (to.getRow() + 1);
-            case MoveType.EN_PASSANT: return (piece.getName() == "P" ? "" : piece.getName()) + this.LETTERS[to.getCol()] + (to.getRow() + 1);
-            case MoveType.CASTLING: return "O-O";
-            default: return "";
-        }
+        return switch (getMoveType()) {
+            case MoveType.NORMAL, MoveType.EN_PASSANT ->
+                    (Objects.equals(piece.getName(), "P") ? "" : piece.getName()) + this.LETTERS[to.getCol()] + (to.getRow() + 1);
+            case MoveType.CASTLING -> "O-O";
+            case MoveType.PROMOTION -> this.LETTERS[to.getCol()] + (to.getRow() + 1) + "=" + promotion;
+        };
     }
 
     public PieceType getPromotion() {

@@ -17,6 +17,9 @@ public class Square {
     }
 
     public Square(String notation) throws IllegalMoveException {
+        if (notation.length() > 2) {
+            throw new IllegalMoveException("Square doesn't exist");
+        }
         OptionalInt col = translateNotationToCol(notation);
         int row = translateNotationToRow(notation);
 
@@ -24,7 +27,7 @@ public class Square {
             this.row = row;
             this.col = col.getAsInt();
         } else {
-            throw new IllegalMoveException("board.Square doesn't exist");
+            throw new IllegalMoveException("Square doesn't exist");
         }
     }
 
@@ -32,16 +35,8 @@ public class Square {
         return col;
     }
 
-    public void setCol(int col) {
-        this.col = col;
-    }
-
     public int getRow() {
         return row;
-    }
-
-    public void setRow(int row) {
-        this.row = row;
     }
 
     @Override

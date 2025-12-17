@@ -10,122 +10,36 @@ import java.util.function.BiPredicate;
 
 public final class MoveGenerator {
     private static Board board;
-    private List<Move> moveHistory;
+    private final List<Move> moveHistory;
 
     public MoveGenerator(Board board) {
-        this.board = board;
+        MoveGenerator.board = board;
         this.moveHistory = new ArrayList<>();
     }
 
-    public static boolean isSquareAttacked(Square to, Color pieceColor) {
-        //check for pawn
-        int[] pawnCaptureDirections = {-1, 1};
-        int colorDirection = pieceColor == Color.WHITE ? 1 : -1;
-
-        for (int direction : pawnCaptureDirections){
-            if(board.isValidSquare(to.getRow() +  colorDirection, to.getCol() + direction)) {
-                Piece piece = board.getPiece(to.getRow() +  colorDirection, to.getCol() + direction);
-                if(piece instanceof Pawn && piece.getColor() != pieceColor) {
-                    return true;
-                }
-            }
-        }
-
-        //check for knight
-        int[][] knightCaptureDirections = { {2, -1}, {2, 1}, {-2, -1}, {-2, 1}, {1, -2}, {1, 2}, {-1, -2}, {-1, 2} };
-        for (int[] direction : knightCaptureDirections){
-            if(board.isValidSquare(to.getRow() +  direction[0], to.getCol() + direction[1])) {
-                Piece piece = board.getPiece(to.getRow() +  direction[0], to.getCol() + direction[1]);
-                if(piece instanceof Knight && piece.getColor() != pieceColor) {
-                    return true;
-                }
-            }
-        }
-
-        //check for bishop/queen
-        int[][] bishopCaptureDirections = { {1, 1}, {1, -1}, {-1, -1}, {-1, 1} };
-        for (int[] direction : bishopCaptureDirections){
-            int row = to.getRow() + direction[0];
-            int col = to.getCol() + direction[1];
-
-            while (board.isValidSquare(row, col)) {
-                Piece piece = board.getPiece(row, col);
-                if((piece instanceof Queen || piece instanceof Bishop) && piece.getColor() != pieceColor) {
-                    return true;
-                }
-
-                if(piece != null && ((!(piece instanceof Queen) && !(piece instanceof Bishop)) || piece.getColor() == pieceColor)) {
-                    break;
-                }
-
-                row += direction[0];
-                col += direction[1];
-            }
-        }
-
-        //check for rook/queen
-        int[][] rookCaptureDirections = { {1, 0}, {0, -1}, {-1, 0}, {0, 1} };
-        for (int[] direction : rookCaptureDirections){
-            int row = to.getRow() + direction[0];
-            int col = to.getCol() + direction[1];
-
-            while (board.isValidSquare(row, col)) {
-                Piece piece = board.getPiece(row, col);
-                if((piece instanceof Queen || piece instanceof Rook) && piece.getColor() != pieceColor) {
-                    return true;
-                }
-
-                if(piece != null && ((!(piece instanceof Queen) && !(piece instanceof Rook)) || piece.getColor() == pieceColor)) {
-                    break;
-                }
-
-                row += direction[0];
-                col += direction[1];
-            }
-        }
-
-        //check for king
-        int[][] kingCaptureDirections = { {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1} };
-        for (int[] direction : kingCaptureDirections){
-            if(board.isValidSquare(to.getRow() +  direction[0], to.getCol() + direction[1])) {
-                Piece piece = board.getPiece(to.getRow() +  direction[0], to.getCol() + direction[1]);
-                if(piece instanceof King && piece.getColor() != pieceColor) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    public static boolean isKingInCheck(Board board, Color color) {
-        Square kingPosition = board.getKingPosition(color);
-        return isSquareAttacked(kingPosition, color);
-    }
-
-    public void movePiece(Square from, Square to, PieceType promotion) throws IllegalMoveException, CloneNotSupportedException {
-        Piece piece = this.board.getPiece(from.getRow(), from.getCol());
+    public void movePiece(Square from, Square to, PieceType promotion, Color sideToMove) throws IllegalMoveException, CloneNotSupportedException {
+        Piece piece = board.getPiece(from.getRow(), from.getCol());
 
         if (piece == null) {
             throw new IllegalMoveException("No piece at " + from.translateSquareToNotation());
         }
 
-        if(piece.getColor() != board.getSideToMove()) {
-            throw new IllegalMoveException("Illegal move.Move: " + board.getSideToMove() + " to move");
+        if(piece.getColor() != sideToMove) {
+            throw new IllegalMoveException("Illegal Move: " + sideToMove + " to move");
         }
 
-        List<Move> legalMoves = this.legalMoves(from);
+        List<Move> legalMoves = this.legalMoves(from, sideToMove);
         boolean isLegal = false;
         Move selectedMove = null;
-        boolean isKingInCheck = isKingInCheck(this.board, this.board.getSideToMove());
+        boolean isKingInCheck = board.isKingInCheck(sideToMove);
 
         for (Move move: legalMoves) {
             if (!move.getTo().equals(to) || move.getPromotion() != promotion) continue;
 
-            Board testBoard = this.board.deepCopy();
+            Board testBoard = board.deepCopy();
             applyMoveToBoardForValidation(testBoard, move);
 
-            boolean kingInCheckAfter = isKingInCheck(testBoard, testBoard.getSideToMove());
+            boolean kingInCheckAfter = testBoard.isKingInCheck(sideToMove);
             if (!kingInCheckAfter) {
                 isLegal = true;
                 selectedMove = move;
@@ -134,9 +48,8 @@ public final class MoveGenerator {
         }
 
         if(isLegal) {
-            applyMoveToBoardForValidation(this.board, selectedMove);
+            applyMoveToBoardForValidation(board, selectedMove);
             this.addMoveToHistory(selectedMove);
-            this.board.switchSide();
         } else {
             if (isKingInCheck) {
                 throw new IllegalMoveException("Illegal move: " + piece.getClass().getSimpleName()
@@ -145,7 +58,22 @@ public final class MoveGenerator {
             throw new IllegalMoveException("Illegal move: " + piece.getClass().getSimpleName()
                     + " cannot move from " + from.translateSquareToNotation() + " to " + to.translateSquareToNotation());
         }
+    }
 
+    public void printBoard() {
+        board.print();
+    }
+
+    public void printHistory () {
+        List<Move> moveHistory = getMoveHistory();
+
+        for (Move move: moveHistory){
+            if (moveHistory.indexOf(move) % 2 == 0) {
+                System.out.print((moveHistory.indexOf(move) + 1) + ". " + move.translateMoveToNotation() + " ");
+            } else {
+                System.out.println(move.translateMoveToNotation() + ";");
+            }
+        }
     }
 
     private void applyMoveToBoardForValidation(Board boardToUse, Move move) {
@@ -179,6 +107,28 @@ public final class MoveGenerator {
         }
     }
 
+    public boolean hasLegalMoves(Color sideToMove) {
+        List<Square> squares = board.getSideSquares(sideToMove);
+
+        for (Square square : squares) {
+            for (Move move: legalMoves(square, sideToMove)) {
+                if (!move.getTo().equals(square)) continue;
+                Board testBoard = board.deepCopy();
+                applyMoveToBoardForValidation(testBoard, move);
+                boolean kingInCheckAfter = testBoard.isKingInCheck(sideToMove);
+                if (!kingInCheckAfter) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public Board getBoard () {
+        return board;
+    }
+
     private Piece getPromotingPiece (PieceType pieceType, Color color) {
         switch (pieceType) {
             case PieceType.ROOK -> {
@@ -199,18 +149,18 @@ public final class MoveGenerator {
         }
     }
 
-    public List<Move> legalMoves(Square from) {
+    public List<Move> legalMoves(Square from, Color sideToMove) {
         Piece piece = board.getPiece(from.getRow(), from.getCol());
-        if (piece == null || piece.getColor() != board.getSideToMove()) return List.of();
-        switch(piece.getClass().getName()) {
-            case "piece.Pawn": return generatePawnMoves(from);
-            case "piece.King": return generateKingMoves(from);
-            case "piece.Queen": return generateQueenMoves(from);
-            case "piece.Bishop": return generateBishopMoves(from);
-            case "piece.Knight": return generateKnightMoves(from);
-            case "piece.Rook": return generateRookMoves(from);
-            default: return List.of();
-        }
+        if (piece == null || piece.getColor() != sideToMove) return List.of();
+        return switch (piece.getClass().getName()) {
+            case "piece.Pawn" -> generatePawnMoves(from);
+            case "piece.King" -> generateKingMoves(from);
+            case "piece.Queen" -> generateQueenMoves(from);
+            case "piece.Bishop" -> generateBishopMoves(from);
+            case "piece.Knight" -> generateKnightMoves(from);
+            case "piece.Rook" -> generateRookMoves(from);
+            default -> List.of();
+        };
     }
 
     private List<Move> generateKnightMoves(Square from) {
@@ -247,7 +197,7 @@ public final class MoveGenerator {
         List<Move> legalMoves = new ArrayList<>();
         Piece piece = board.getPiece(from.getRow(), from.getCol());
 
-        if (piece == null || !(piece instanceof King)) return legalMoves;
+        if (!(piece instanceof King king)) return legalMoves;
 
         Color kingColor = piece.getColor();
 
@@ -263,12 +213,11 @@ public final class MoveGenerator {
             Piece currentPiece = board.getPiece(row, col);
             boolean isCapture = currentPiece != null && currentPiece.getColor() != kingColor;
 
-            if((currentPiece == null || isCapture) && !isSquareAttacked(to, kingColor)) {
+            if((currentPiece == null || isCapture) && !board.isSquareAttacked(to, kingColor)) {
                 legalMoves.add(new Move(from, to, piece));
             }
         }
 
-        King king = (King)piece;
         int row = from.getRow();
         int col = from.getCol();
 
@@ -285,9 +234,9 @@ public final class MoveGenerator {
             if(board.isValidSquare(row, f1) && board.isValidSquare(row, f2) && board.isValidSquare(row, rookFile)) {
                 if(board.getPiece(row, f1) == null && board.getPiece(row, f2) == null
                         && rookAt.test(rookFile, null)
-                        && !isSquareAttacked(from, kingColor)
-                        && !isSquareAttacked(new Square(row, f1), kingColor)
-                        && !isSquareAttacked(new Square(row, f2), kingColor)
+                        && !board.isSquareAttacked(from, kingColor)
+                        && !board.isSquareAttacked(new Square(row, f1), kingColor)
+                        && !board.isSquareAttacked(new Square(row, f2), kingColor)
                 ) {
                     legalMoves.add(new Move(from, new Square(row, f2), MoveType.CASTLING, king));
                 }
@@ -302,9 +251,9 @@ public final class MoveGenerator {
             if(board.isValidSquare(row, f1) && board.isValidSquare(row, f2) && board.isValidSquare(row, f3) && board.isValidSquare(row, rookFile)) {
                 if(board.getPiece(row, f1) == null && board.getPiece(row, f2) == null && board.getPiece(row, f3) == null
                         && rookAt.test(rookFile, null)
-                        && !isSquareAttacked(from, kingColor)
-                        && !isSquareAttacked(new Square(row, f1), kingColor)
-                        && !isSquareAttacked(new Square(row, f2), kingColor)
+                        && !board.isSquareAttacked(from, kingColor)
+                        && !board.isSquareAttacked(new Square(row, f1), kingColor)
+                        && !board.isSquareAttacked(new Square(row, f2), kingColor)
                 ) {
                     legalMoves.add(new Move(from, new Square(row, f2), MoveType.CASTLING, king));
                 }

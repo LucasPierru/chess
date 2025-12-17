@@ -2,25 +2,19 @@ package board;
 
 import piece.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Board implements Cloneable  {
-    private piece.Piece[][] board = new piece.Piece[8][8];
-    private Color sideToMove = Color.WHITE;
+    private final Piece[][] board = new Piece[8][8];
     private final String[] letters = {"a", "b", "c", "d", "e", "f", "g", "h"};
 
     public Board() {
         this.initializeBoard();
     }
 
-    public piece.Piece[][] getBoard() {
-        return board;
-    }
-
-    public void setBoard(Piece[][] board) {
-        this.board = board;
-    }
-
-    public piece.Piece getPiece(int row, int col) {
-        return this.isValidSquare(row, col) ? this.board[row][col] : null;
+    public Piece getPiece(int row, int col) {
+        return isValidSquare(row, col) ? this.board[row][col] : null;
     }
 
     public void setPiece(int row, int col, Piece piece) {
@@ -31,31 +25,7 @@ public class Board implements Cloneable  {
         return row >= 0 && row < 8 && col >= 0 && col < 8;
     }
 
-    public void switchSide() {
-        this.sideToMove = this.sideToMove == Color.WHITE ? Color.BLACK : Color.WHITE;
-    }
-
-    public Color getSideToMove() {
-        return this.sideToMove;
-    }
-
-    public boolean isCheckmate() {
-
-        return false;
-    }
-
-    public King getKing(Color pieceColor) {
-        for (piece.Piece[] rows : this.board) {
-            for (piece.Piece piece: rows){
-                if (piece instanceof King && piece.getColor() == pieceColor) {
-                    return (King)piece;
-                }
-            }
-        }
-        return null;
-    }
-
-    public Square getKingPosition (Color pieceColor) {
+    public Square getKingPosition(Color pieceColor) {
         Piece[][] pieces = this.board;
         for (int i = 0; i < pieces.length; i++) {
             for (int j = 0; j < pieces[i].length; j++){
@@ -66,6 +36,111 @@ public class Board implements Cloneable  {
             }
         }
         return null;
+    }
+
+    public List<Square> getSideSquares(Color pieceColor) {
+        List<Square> squares = new ArrayList<>();
+        Piece[][] pieces = getBoard();
+        for (int i = 0; i < pieces.length; i++) {
+            for (int j = 0; j < pieces[i].length; j++){
+                Piece piece = pieces[i][j];
+                if (piece != null  && piece.getColor() == pieceColor) {
+                    squares.add(new Square(i, j));
+                }
+            }
+        }
+
+        return squares;
+    }
+
+    public Piece[][] getBoard() {
+        return board;
+    }
+
+    public boolean isSquareAttacked(Square to, Color pieceColor) {
+        //check for pawn
+        int[] pawnCaptureDirections = {-1, 1};
+        int colorDirection = pieceColor == Color.WHITE ? 1 : -1;
+
+        for (int direction : pawnCaptureDirections){
+            if(this.isValidSquare(to.getRow() +  colorDirection, to.getCol() + direction)) {
+                Piece piece = this.getPiece(to.getRow() +  colorDirection, to.getCol() + direction);
+                if(piece instanceof Pawn && piece.getColor() != pieceColor) {
+                    return true;
+                }
+            }
+        }
+
+        //check for knight
+        int[][] knightCaptureDirections = { {2, -1}, {2, 1}, {-2, -1}, {-2, 1}, {1, -2}, {1, 2}, {-1, -2}, {-1, 2} };
+        for (int[] direction : knightCaptureDirections){
+            if(this.isValidSquare(to.getRow() +  direction[0], to.getCol() + direction[1])) {
+                Piece piece = this.getPiece(to.getRow() +  direction[0], to.getCol() + direction[1]);
+                if(piece instanceof Knight && piece.getColor() != pieceColor) {
+                    return true;
+                }
+            }
+        }
+
+        //check for bishop/queen
+        int[][] bishopCaptureDirections = { {1, 1}, {1, -1}, {-1, -1}, {-1, 1} };
+        for (int[] direction : bishopCaptureDirections){
+            int row = to.getRow() + direction[0];
+            int col = to.getCol() + direction[1];
+
+            while (this.isValidSquare(row, col)) {
+                Piece piece = this.getPiece(row, col);
+                if((piece instanceof Queen || piece instanceof Bishop) && piece.getColor() != pieceColor) {
+                    return true;
+                }
+
+                if(piece != null && ((!(piece instanceof Queen) && !(piece instanceof Bishop)) || piece.getColor() == pieceColor)) {
+                    break;
+                }
+
+                row += direction[0];
+                col += direction[1];
+            }
+        }
+
+        //check for rook/queen
+        int[][] rookCaptureDirections = { {1, 0}, {0, -1}, {-1, 0}, {0, 1} };
+        for (int[] direction : rookCaptureDirections){
+            int row = to.getRow() + direction[0];
+            int col = to.getCol() + direction[1];
+
+            while (this.isValidSquare(row, col)) {
+                Piece piece = this.getPiece(row, col);
+                if((piece instanceof Queen || piece instanceof Rook) && piece.getColor() != pieceColor) {
+                    return true;
+                }
+
+                if(piece != null && ((!(piece instanceof Queen) && !(piece instanceof Rook)) || piece.getColor() == pieceColor)) {
+                    break;
+                }
+
+                row += direction[0];
+                col += direction[1];
+            }
+        }
+
+        //check for king
+        int[][] kingCaptureDirections = { {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1} };
+        for (int[] direction : kingCaptureDirections){
+            if(this.isValidSquare(to.getRow() +  direction[0], to.getCol() + direction[1])) {
+                Piece piece = this.getPiece(to.getRow() +  direction[0], to.getCol() + direction[1]);
+                if(piece instanceof King && piece.getColor() != pieceColor) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public boolean isKingInCheck(Color color) {
+        Square kingPosition = this.getKingPosition(color);
+        return this.isSquareAttacked(kingPosition, color);
     }
 
     public void initializeBoard() {
@@ -127,9 +202,9 @@ public class Board implements Cloneable  {
             }
             System.out.println();
         }
-        for (int k = 0; k < this.letters.length; k++) {
+        for (String letter : this.letters) {
             System.out.print("  ");
-            System.out.print(" " + letters[k]);
+            System.out.print(" " + letter);
         }
         System.out.println();
     }
@@ -151,17 +226,14 @@ public class Board implements Cloneable  {
                 if (p == null) {
                     copy.board[r][f] = null;
                 } else {
-                    // If piece.Piece is immutable you can reuse the reference:
+                    // If Piece is immutable you can reuse the reference:
                     copy.board[r][f] = p;
 
-                    // If piece.Piece is mutable, replace the previous line with something like:
+                    // If Piece is mutable, replace the previous line with something like:
                     // copy.board[r][f] = p.clone(); // or new piece.Piece(p) if you have a copy constructor
                 }
             }
         }
-
-        // primitive or immutable fields: copy directly
-        copy.sideToMove = this.sideToMove;
 
         return copy;
     }
