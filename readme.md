@@ -1,15 +1,15 @@
 # ♟️ Chess (Java)
 
-A **pure Java implementation of Chess** focused on clean object-oriented design and accurate move generation.
+A **pure Java implementation of Chess** focused on clean object-oriented design and accurate main.java.chess.move generation.
 
-This project models the core rules of chess (pieces, board, moves, legality checks) and is structured to be easily extended with a UI, AI engine, or networking layer later.
+This project models the core rules of chess (pieces, main.java.chess.board, moves, legality checks) and is structured to be easily extended with a UI, AI engine, or networking layer later.
 
 ---
 
 ## 🧠 Project Goals
 
 * Practice **object-oriented design** (SOLID principles)
-* Implement **correct chess rules** and legal move generation
+* Implement **correct chess rules** and legal main.java.chess.move generation
 * Keep the core logic **UI-agnostic**
 * Build a strong foundation for future features (GUI, engine, multiplayer)
 
@@ -17,19 +17,19 @@ This project models the core rules of chess (pieces, board, moves, legality chec
 
 ## ✨ Features
 
-* Full board representation (`board.Board`, `board.Square`)
+* Full main.java.chess.board representation (`main.java.chess.board.Board`, `main.java.chess.board.Square`)
 * All chess pieces implemented:
-    * piece.King
-    * piece.Queen
-    * piece.Rook
-    * piece.Bishop
-    * piece.Knight
-    * piece.Pawn
-* Centralized **move generation**
-* move.Move validation and illegal move handling
+    * main.java.chess.piece.King
+    * main.java.chess.piece.Queen
+    * main.java.chess.piece.Rook
+    * main.java.chess.piece.Bishop
+    * main.java.chess.piece.Knight
+    * main.java.chess.piece.Pawn
+* Centralized **main.java.chess.move generation**
+* main.java.chess.move.Move validation and illegal main.java.chess.move handling
 * Explicit modeling of:
-    * move.Move types
-    * piece.Piece types
+    * main.java.chess.move.Move types
+    * main.java.chess.piece.Piece types
     * Colors
 * Custom exception for illegal moves
 
@@ -40,23 +40,23 @@ This project models the core rules of chess (pieces, board, moves, legality chec
 ```
 chess/
 ├── src/
-│   ├── Main.java              # Application entry point
-│   ├── board.Board.java             # board.Board state and game logic
-│   ├── board.Square.java            # board.Board squares
-│   ├── piece.Piece.java             # Abstract piece base class
-│   ├── piece.Pawn.java
-│   ├── piece.Rook.java
-│   ├── piece.Knight.java
-│   ├── piece.Bishop.java
-│   ├── piece.Queen.java
-│   ├── piece.King.java
-│   ├── piece.PieceType.java         # Enum of piece types
-│   ├── piece.Color.java             # piece.Piece color enum
-│   ├── move.Move.java              # Domain move object
-│   ├── move.MoveDto.java           # move.Move data transfer object
-│   ├── move.MoveGenerator.java     # Legal move generation
-│   ├── move.MoveType.java          # Enum of move types
-│   └── move.IllegalMoveException.java
+│   ├── main.java.Main.java              # Application entry point
+│   ├── main.java.chess.board.Board.java             # main.java.chess.board.Board state and main.java.chess.game logic
+│   ├── main.java.chess.board.Square.java            # main.java.chess.board.Board squares
+│   ├── main.java.chess.piece.Piece.java             # Abstract main.java.chess.piece base class
+│   ├── main.java.chess.piece.Pawn.java
+│   ├── main.java.chess.piece.Rook.java
+│   ├── main.java.chess.piece.Knight.java
+│   ├── main.java.chess.piece.Bishop.java
+│   ├── main.java.chess.piece.Queen.java
+│   ├── main.java.chess.piece.King.java
+│   ├── main.java.chess.piece.PieceType.java         # Enum of main.java.chess.piece types
+│   ├── main.java.chess.piece.Color.java             # main.java.chess.piece.Piece color enum
+│   ├── main.java.chess.move.Move.java              # Domain main.java.chess.move object
+│   ├── main.java.chess.move.MoveDto.java           # main.java.chess.move.Move data transfer object
+│   ├── main.java.chess.move.MoveGenerator.java     # Legal main.java.chess.move generation
+│   ├── main.java.chess.move.MoveType.java          # Enum of main.java.chess.move types
+│   └── main.java.chess.move.IllegalMoveException.java
 ├── .gitignore
 ├── chess.iml
 └── README.md
@@ -88,34 +88,34 @@ Using the command line:
 
 ```bash
 javac src/*.java
-java Main
+java main.java.Main
 ```
 
-Or simply run `Main.java` from your IDE.
+Or simply run `main.java.Main.java` from your IDE.
 
 ---
 
 ## 🧩 Design Overview
 
-### board.Board & Squares
+### main.java.chess.board.Board & Squares
 
-* `board.Board` owns the state of the game
-* `board.Board` contains an 8x8 array of `piece.Piece`
+* `main.java.chess.board.Board` owns the state of the main.java.chess.game
+* `main.java.chess.board.Board` contains an 8x8 array of `main.java.chess.piece.Piece`
 
 ### Pieces
 
-* All pieces extend the abstract `piece.Piece` class
-* piece.Piece-specific movement logic is encapsulated per class
+* All pieces extend the abstract `main.java.chess.piece.Piece` class
+* main.java.chess.piece.Piece-specific movement logic is encapsulated per class
 
-### move.Move Generation
+### main.java.chess.move.Move Generation
 
-* `move.MoveGenerator` computes and validates **legal moves**
-* `move.Move` represents a validated domain action
-* `move.MoveDto` can be used for UI / external input
+* `main.java.chess.move.MoveGenerator` computes and validates **legal moves**
+* `main.java.chess.move.Move` represents a validated domain action
+* `main.java.chess.move.MoveDto` can be used for UI / external input
 
 ### Error Handling
 
-* `move.IllegalMoveException` is thrown when invalid moves are attempted
+* `main.java.chess.move.IllegalMoveException` is thrown when invalid moves are attempted
 
 ---
 
@@ -135,7 +135,7 @@ Currently manual testing via execution.
 
 Planned:
 
-* JUnit tests for move generation
+* JUnit tests for main.java.chess.move generation
 * Regression tests for edge cases
 
 ---
