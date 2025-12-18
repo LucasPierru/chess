@@ -1,4 +1,4 @@
-package com.lucas.chess.move;
+package com.lucas.chess.core.move;
 
 public class IllegalMoveException extends Exception{
     public IllegalMoveException(String message) {

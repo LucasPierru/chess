@@ -1,7 +1,8 @@
-package com.lucas.chess.move;
+package com.lucas.chess.core.move;
 
-import com.lucas.chess.board.Board;
-import com.lucas.chess.board.Square;
+import com.lucas.chess.core.board.Board;
+import com.lucas.chess.core.board.Square;
+import com.lucas.chess.core.piece.*;
 import com.lucas.chess.piece.*;
 
 import java.util.ArrayList;

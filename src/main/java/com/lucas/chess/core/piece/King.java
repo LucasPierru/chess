@@ -1,4 +1,4 @@
-package com.lucas.chess.piece;
+package com.lucas.chess.core.piece;
 
 public class King extends Piece {
     private boolean hasShortCastleRights;

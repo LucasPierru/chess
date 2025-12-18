@@ -1,6 +1,6 @@
-package com.lucas.chess.board;
+package com.lucas.chess.core.board;
 
-import com.lucas.chess.piece.*;
+import com.lucas.chess.core.piece.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -207,6 +207,65 @@ public class Board implements Cloneable  {
             System.out.print(" " + letter);
         }
         System.out.println();
+    }
+
+    public String convertToFEN (Color sideToMove, String enPassant,  int halfmoveClock, int fullmoveNumber) {
+        StringBuilder fen = new StringBuilder();
+
+        StringBuilder whiteCastleRights = new StringBuilder();
+        StringBuilder blackCastleRights = new StringBuilder();
+
+        int empty = 0;
+        for (int i = this.board.length - 1; i >= 0; i--) {
+            for (int j = 0; j < this.board[i].length; j++) {
+                if(this.board[i][j] == null) {
+                    empty += 1;
+                } else {
+                    if (this.board[i][j] instanceof King king && this.board[i][j].getColor() == Color.WHITE) {
+                        if(!king.getHasShortCastleRights() && !king.getHasLongCastleRights()) {
+                            whiteCastleRights.append("-");
+                        } else {
+                            whiteCastleRights.append(king.getHasShortCastleRights() ? "K" : "");
+                            whiteCastleRights.append(king.getHasLongCastleRights() ? "Q" : "");
+                        }
+                    }
+                    if (this.board[i][j] instanceof King king && this.board[i][j].getColor() == Color.BLACK) {
+                        if(!king.getHasShortCastleRights() && !king.getHasLongCastleRights()) {
+                            blackCastleRights.append("-");
+                        } else {
+                            blackCastleRights.append(king.getHasShortCastleRights() ? "k" : "");
+                            blackCastleRights.append(king.getHasLongCastleRights() ? "q" : "");
+                        }
+                    }
+                    if (empty > 0) {
+                        fen.append(empty);
+                        empty = 0;
+                    }
+                    fen.append(this.board[i][j].getColor() == Color.BLACK ? this.board[i][j].getName().toLowerCase() : this.board[i][j].getName());
+                }
+            }
+            fen.append(empty == 8 ? "8/" : "/");
+        }
+
+        fen.append(sideToMove == Color.WHITE ? " w " : " b ");
+
+        if (whiteCastleRights.toString().equals("-") && blackCastleRights.toString().equals("-")) {
+            fen.append(" -");
+        } else {
+            fen.append(whiteCastleRights.toString());
+            fen.append(blackCastleRights.toString());
+        }
+
+        fen.append(' ');
+        fen.append(enPassant == null ? "-" : enPassant);
+
+        fen.append(' ');
+        fen.append(halfmoveClock);
+
+        fen.append(' ');
+        fen.append(fullmoveNumber);
+
+        return fen.toString();
     }
 
     @Override

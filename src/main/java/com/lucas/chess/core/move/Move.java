@@ -1,8 +1,8 @@
-package com.lucas.chess.move;
+package com.lucas.chess.core.move;
 
-import com.lucas.chess.board.Square;
-import com.lucas.chess.piece.Piece;
-import com.lucas.chess.piece.PieceType;
+import com.lucas.chess.core.board.Square;
+import com.lucas.chess.core.piece.Piece;
+import com.lucas.chess.core.piece.PieceType;
 
 import java.util.Objects;
 

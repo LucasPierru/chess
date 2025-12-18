@@ -1,6 +1,6 @@
-package com.lucas.chess.board;
+package com.lucas.chess.core.board;
 
-import com.lucas.chess.move.IllegalMoveException;
+import com.lucas.chess.core.move.IllegalMoveException;
 
 import java.util.Objects;
 import java.util.OptionalInt;

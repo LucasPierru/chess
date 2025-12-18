@@ -1,4 +1,4 @@
-package com.lucas.chess.piece;
+package com.lucas.chess.core.piece;
 
 public class Rook extends Piece {
     private int[][] DIRECTIONS = { {0, -1}, {0, 1}, {-1, 0}, {1, 0} };

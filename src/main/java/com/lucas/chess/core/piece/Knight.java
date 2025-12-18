@@ -1,4 +1,4 @@
-package com.lucas.chess.piece;
+package com.lucas.chess.core.piece;
 
 public class Knight extends Piece {
     public Knight(Color color) {

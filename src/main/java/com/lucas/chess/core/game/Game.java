@@ -1,9 +1,9 @@
-package com.lucas.chess.game;
+package com.lucas.chess.core.game;
 
-import com.lucas.chess.board.Square;
-import com.lucas.chess.move.IllegalMoveException;
-import com.lucas.chess.move.MoveGenerator;
-import com.lucas.chess.piece.Color;
+import com.lucas.chess.core.board.Square;
+import com.lucas.chess.core.move.IllegalMoveException;
+import com.lucas.chess.core.move.MoveGenerator;
+import com.lucas.chess.core.piece.Color;
 
 import java.util.Scanner;
 
