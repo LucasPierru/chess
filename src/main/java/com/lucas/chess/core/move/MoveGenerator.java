@@ -3,7 +3,6 @@ package com.lucas.chess.core.move;
 import com.lucas.chess.core.board.Board;
 import com.lucas.chess.core.board.Square;
 import com.lucas.chess.core.piece.*;
-import com.lucas.chess.piece.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -421,7 +420,88 @@ public final class MoveGenerator {
         return moveHistory;
     }
 
+    public Move getLastMove() {
+        return !moveHistory.isEmpty() ? moveHistory.get(moveHistory.size()-1) : null;
+    }
+
     private void addMoveToHistory(Move move) {
         this.moveHistory.add(move);
+    }
+
+    public int getHalfMoveClock() {
+        return moveHistory.size();
+    }
+
+    public int getFullMoveNumber() {
+        return moveHistory.size()/2 + 1;
+    }
+
+    public String convertToFEN (Color sideToMove) {
+        StringBuilder fen = new StringBuilder();
+
+        StringBuilder whiteCastleRights = new StringBuilder();
+        StringBuilder blackCastleRights = new StringBuilder();
+
+        Piece[][] pieces = board.getBoard();
+
+        int empty = 0;
+        for (int i = pieces.length - 1; i >= 0; i--) {
+            for (int j = 0; j < board.getBoard()[i].length; j++) {
+                if(pieces[i][j] == null) {
+                    empty += 1;
+                } else {
+                    if (pieces[i][j] instanceof King king && pieces[i][j].getColor() == Color.WHITE) {
+                        if(!king.getHasShortCastleRights() && !king.getHasLongCastleRights()) {
+                            whiteCastleRights.append("-");
+                        } else {
+                            whiteCastleRights.append(king.getHasShortCastleRights() ? "K" : "");
+                            whiteCastleRights.append(king.getHasLongCastleRights() ? "Q" : "");
+                        }
+                    }
+                    if (pieces[i][j] instanceof King king && pieces[i][j].getColor() == Color.BLACK) {
+                        if(!king.getHasShortCastleRights() && !king.getHasLongCastleRights()) {
+                            blackCastleRights.append("-");
+                        } else {
+                            blackCastleRights.append(king.getHasShortCastleRights() ? "k" : "");
+                            blackCastleRights.append(king.getHasLongCastleRights() ? "q" : "");
+                        }
+                    }
+                    if (empty > 0) {
+                        fen.append(empty);
+                        empty = 0;
+                    }
+                    fen.append(pieces[i][j].getColor() == Color.BLACK ? pieces[i][j].getName().toLowerCase() : pieces[i][j].getName());
+                }
+            }
+            fen.append(empty < 8 ? "" : "8");
+            fen.append(i > 0 ? "/" : "");
+            empty = 0;
+        }
+
+        fen.append(sideToMove == Color.WHITE ? " w " : " b ");
+
+        if (whiteCastleRights.toString().equals("-") && blackCastleRights.toString().equals("-")) {
+            fen.append(" -");
+        } else {
+            fen.append(whiteCastleRights.toString());
+            fen.append(blackCastleRights.toString());
+        }
+
+        Move lastMove = getLastMove();
+        int direction = sideToMove == Color.WHITE ? 1 : -1;
+        String enPassant = lastMove != null && lastMove.getPiece() instanceof Pawn
+                && Math.abs(lastMove.getTo().getRow() - lastMove.getFrom().getRow()) == 2
+                ? new Square(lastMove.getFrom().getRow() + direction, lastMove.getFrom().getCol()).translateSquareToNotation() : "-";
+
+        fen.append(' ');
+        fen.append(enPassant);
+
+        fen.append(' ');
+        fen.append(getHalfMoveClock());
+
+        fen.append(' ');
+        fen.append(getFullMoveNumber());
+
+        return fen.toString();
     }
 }

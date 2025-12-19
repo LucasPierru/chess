@@ -1,23 +1,26 @@
 package com.lucas.chess.configurations;
 
-import com.lucas.chess.handlers.ChessWebSocketHandler;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.socket.config.annotation.EnableWebSocket;
-import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
-@EnableWebSocket
-public class WebSocketConfig implements WebSocketConfigurer {
-    private ChessWebSocketHandler handler;
-
-    public WebSocketConfig(ChessWebSocketHandler handler) {
-        this.handler = handler;
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        // Designates a prefix for destinations (topics, queues) handled by the message broker.
+        // Clients subscribe to these (e.g., /topic/room1).
+        config.enableSimpleBroker("/topic");
+        // Designates a prefix for destinations that the app's message-handling methods listen to.
+        config.setApplicationDestinationPrefixes("/app");
     }
 
     @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(handler, "/chess")
-                .setAllowedOrigins("*");
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        // Registers the WebSocket endpoint that clients will use to connect (e.g., ws://localhost:8080/ws)
+        registry.addEndpoint("/ws").setAllowedOrigins("*"); // SockJS provides fallback options
     }
 }
