@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.function.BiPredicate;
 
 public final class MoveGenerator {
-    private static Board board;
+    private final Board board;
     private final List<Move> moveHistory;
 
     public MoveGenerator(Board board) {
-        MoveGenerator.board = board;
+        this.board = board;
         this.moveHistory = new ArrayList<>();
     }
 
@@ -21,11 +21,11 @@ public final class MoveGenerator {
         Piece piece = board.getPiece(from.getRow(), from.getCol());
 
         if (piece == null) {
-            throw new IllegalMoveException("No main.java.chess.piece at " + from.translateSquareToNotation());
+            throw new IllegalMoveException("No piece at " + from.translateSquareToNotation());
         }
 
         if(piece.getColor() != sideToMove) {
-            throw new IllegalMoveException("Illegal Move: " + sideToMove + " to main.java.chess.move");
+            throw new IllegalMoveException("Illegal Move: " + sideToMove + " to move");
         }
 
         List<Move> legalMoves = this.legalMoves(from, sideToMove);
@@ -52,11 +52,11 @@ public final class MoveGenerator {
             this.addMoveToHistory(selectedMove);
         } else {
             if (isKingInCheck) {
-                throw new IllegalMoveException("Illegal main.java.chess.move: " + piece.getClass().getSimpleName()
-                        + " cannot main.java.chess.move from " + from.translateSquareToNotation() + " to " + to.translateSquareToNotation() + " Your king is in check");
+                throw new IllegalMoveException("Illegalmove: " + piece.getClass().getSimpleName()
+                        + " cannot move from " + from.translateSquareToNotation() + " to " + to.translateSquareToNotation() + " Your king is in check");
             }
-            throw new IllegalMoveException("Illegal main.java.chess.move: " + piece.getClass().getSimpleName()
-                    + " cannot main.java.chess.move from " + from.translateSquareToNotation() + " to " + to.translateSquareToNotation());
+            throw new IllegalMoveException("Illegal move: " + piece.getClass().getSimpleName()
+                    + " cannot move from " + from.translateSquareToNotation() + " to " + to.translateSquareToNotation());
         }
     }
 
@@ -69,7 +69,7 @@ public final class MoveGenerator {
 
         for (Move move: moveHistory){
             if (moveHistory.indexOf(move) % 2 == 0) {
-                System.out.print((moveHistory.indexOf(move) + 1) + ". " + move.translateMoveToNotation() + " ");
+                System.out.print((moveHistory.indexOf(move)/2 + 1) + ". " + move.translateMoveToNotation() + " ");
             } else {
                 System.out.println(move.translateMoveToNotation() + ";");
             }
@@ -152,13 +152,13 @@ public final class MoveGenerator {
     public List<Move> legalMoves(Square from, Color sideToMove) {
         Piece piece = board.getPiece(from.getRow(), from.getCol());
         if (piece == null || piece.getColor() != sideToMove) return List.of();
-        return switch (piece.getClass().getName()) {
-            case "Pawn" -> generatePawnMoves(from);
-            case "King" -> generateKingMoves(from);
-            case "Queen" -> generateQueenMoves(from);
-            case "Bishop" -> generateBishopMoves(from);
-            case "Knight" -> generateKnightMoves(from);
-            case "Rook" -> generateRookMoves(from);
+        return switch (piece.getName()) {
+            case "P" -> generatePawnMoves(from);
+            case "K" -> generateKingMoves(from);
+            case "Q" -> generateQueenMoves(from);
+            case "B" -> generateBishopMoves(from);
+            case "N" -> generateKnightMoves(from);
+            case "R" -> generateRookMoves(from);
             default -> List.of();
         };
     }
@@ -338,7 +338,7 @@ public final class MoveGenerator {
 
             while (board.isValidSquare(row, col)) {
                 Square to = new Square(row, col);
-                Piece currentPiece = board.getPiece(col, row);
+                Piece currentPiece = board.getPiece(row, col);
                 Move move = new Move(from, to, piece);
 
                 if(currentPiece == null) {
@@ -353,7 +353,6 @@ public final class MoveGenerator {
                 col += dir[1];
             }
         }
-
         return legalMoves;
     }
 
@@ -429,11 +428,20 @@ public final class MoveGenerator {
     }
 
     public int getHalfMoveClock() {
-        return moveHistory.size();
+        int count = 0;
+        for (int i = moveHistory.size() -1; i >= 0; i--) {
+            if(!(moveHistory.get(i).getPiece() instanceof Pawn)) {
+                count += 1;
+            } else {
+                return count;
+            }
+        }
+
+        return count;
     }
 
     public int getFullMoveNumber() {
-        return moveHistory.size()/2 + 1;
+        return moveHistory.size()/2;
     }
 
     public String convertToFEN (Color sideToMove) {
@@ -473,7 +481,7 @@ public final class MoveGenerator {
                     fen.append(pieces[i][j].getColor() == Color.BLACK ? pieces[i][j].getName().toLowerCase() : pieces[i][j].getName());
                 }
             }
-            fen.append(empty < 8 ? "" : "8");
+            fen.append(empty < 8 ? empty > 0 ? empty : "" : "8");
             fen.append(i > 0 ? "/" : "");
             empty = 0;
         }
@@ -483,12 +491,12 @@ public final class MoveGenerator {
         if (whiteCastleRights.toString().equals("-") && blackCastleRights.toString().equals("-")) {
             fen.append(" -");
         } else {
-            fen.append(whiteCastleRights.toString());
-            fen.append(blackCastleRights.toString());
+            fen.append(whiteCastleRights);
+            fen.append(blackCastleRights);
         }
 
         Move lastMove = getLastMove();
-        int direction = sideToMove == Color.WHITE ? 1 : -1;
+        int direction = sideToMove == Color.WHITE ? -1 : 1;
         String enPassant = lastMove != null && lastMove.getPiece() instanceof Pawn
                 && Math.abs(lastMove.getTo().getRow() - lastMove.getFrom().getRow()) == 2
                 ? new Square(lastMove.getFrom().getRow() + direction, lastMove.getFrom().getCol()).translateSquareToNotation() : "-";

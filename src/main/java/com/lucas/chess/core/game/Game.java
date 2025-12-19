@@ -4,6 +4,7 @@ import com.lucas.chess.core.board.Square;
 import com.lucas.chess.core.move.IllegalMoveException;
 import com.lucas.chess.core.move.MoveGenerator;
 import com.lucas.chess.core.piece.Color;
+import com.lucas.chess.core.piece.PieceType;
 
 import java.util.Scanner;
 
@@ -64,7 +65,27 @@ public class Game {
         return sideToMove == Color.WHITE ? Color.BLACK : Color.WHITE;
     }
 
-    private void switchSide() {
+    public void switchSide() {
         this.sideToMove = this.sideToMove == Color.WHITE ? Color.BLACK : Color.WHITE;
+    }
+
+    public Color getSideToMove() {
+        return this.sideToMove;
+    }
+
+    public void movePiece(Square from, Square to, PieceType promotion) throws IllegalMoveException, CloneNotSupportedException {
+        moveGenerator.movePiece(from, to, promotion, sideToMove);
+    }
+
+    public void printMoveHistory(){
+        moveGenerator.printHistory();
+    }
+
+    public String encodeFen() {
+        return moveGenerator.convertToFEN(sideToMove);
+    }
+
+    public void printBoard(){
+        moveGenerator.printBoard();
     }
 }
