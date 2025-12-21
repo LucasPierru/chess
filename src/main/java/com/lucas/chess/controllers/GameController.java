@@ -44,8 +44,6 @@ public class GameController {
         String playerId = principal.getName();
         GameRoom gameRoom = getOrCreateGame(room);
 
-        System.out.println("Principal = " + principal.getName());
-
         Color color = gameRoom.getColor(playerId);
 
         if(color == null) {
@@ -53,10 +51,13 @@ public class GameController {
             color = gameRoom.getColor(playerId);
         }
 
+        int numberOfPlayers = gameRoom.getNumberOfPlayers();
+        int numberOfSpectators = gameRoom.getNumberOfSpectators();
+
         messagingTemplate.convertAndSendToUser(
                 principal.getName(),
                 "/queue/game/init",
-                new InitMessage(gameRoom.encodeFen(), color, color != null)
+                new InitMessage(gameRoom.encodeFen(), color, color != null, numberOfPlayers, numberOfSpectators)
         );
     }
 

@@ -6,9 +6,13 @@ public class GameRoom {
     private final Game game;
     private String whitePlayerId;
     private String blackPlayerId;
+    private static int numberOfGames;
+    private int numberOfPlayers;
+    private int numberOfSpectators;
 
     public GameRoom (Game game) {
         this.game = game;
+        numberOfGames++;
     }
 
     public boolean isSeatTaken(Color color) {
@@ -20,12 +24,15 @@ public class GameRoom {
     public Color assignPlayer(String playerId) {
         if (whitePlayerId == null) {
             whitePlayerId = playerId;
+            numberOfPlayers++;
             return Color.WHITE;
         }
         if (blackPlayerId == null) {
             blackPlayerId = playerId;
+            numberOfPlayers++;
             return Color.BLACK;
         }
+        numberOfSpectators++;
         return null; // spectator
     }
 
@@ -41,5 +48,17 @@ public class GameRoom {
 
     public Game getGame() {
         return game;
+    }
+
+    public int getNumberOfGames() {
+        return numberOfGames;
+    }
+
+    public int getNumberOfPlayers() {
+        return numberOfPlayers;
+    }
+
+    public int getNumberOfSpectators() {
+        return numberOfSpectators;
     }
 }
