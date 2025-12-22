@@ -7,10 +7,7 @@ import com.lucas.chess.core.game.GameRoom;
 import com.lucas.chess.core.move.IllegalMoveException;
 import com.lucas.chess.core.move.MoveGenerator;
 import com.lucas.chess.core.piece.Color;
-import com.lucas.chess.dto.BoardUpdateMessage;
-import com.lucas.chess.dto.InitMessage;
-import com.lucas.chess.dto.MessageType;
-import com.lucas.chess.dto.MoveMessage;
+import com.lucas.chess.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -32,6 +29,7 @@ public class GameController {
     }
 
     private GameRoom getOrCreateGame(String room) {
+        System.out.println(sessions);
         return sessions.computeIfAbsent(room, r -> {
             Board board = new Board();
             MoveGenerator moveGenerator = new MoveGenerator(board);
@@ -39,7 +37,19 @@ public class GameController {
         });
     }
 
-    @MessageMapping("/game/init/{room}")
+    @MessageMapping("/game/create/{room}")
+    public void create(@DestinationVariable String room, GameInitMessage message, Principal principal) {
+        System.out.println(message);
+        String playerId = principal.getName();
+        GameRoom gameRoom = getOrCreateGame(room);
+        Color color = gameRoom.getColor(playerId);
+
+        if(color == null) {
+            gameRoom.assignPlayer(playerId);
+        }
+    }
+
+    @MessageMapping("/game/join/{room}")
     public void init(@DestinationVariable String room, Principal principal) {
         String playerId = principal.getName();
         GameRoom gameRoom = getOrCreateGame(room);
@@ -56,9 +66,16 @@ public class GameController {
 
         messagingTemplate.convertAndSendToUser(
                 principal.getName(),
-                "/queue/game/init",
-                new InitMessage(gameRoom.encodeFen(), color, color != null, numberOfPlayers, numberOfSpectators)
+                "/queue/player/join",
+                new PlayerJoinMessage(color, color != null, numberOfPlayers, numberOfSpectators)
         );
+
+        if(numberOfPlayers > 1) {
+            messagingTemplate.convertAndSend(
+                    "/queue/game/init/" + room,
+                    new InitMessage(gameRoom.encodeFen(), numberOfPlayers, numberOfSpectators)
+            );
+        }
     }
 
     @MessageMapping("/game/{room}")
