@@ -45,7 +45,7 @@ public class GameController {
         Color color = gameRoom.getColor(playerId);
 
         if(color == null) {
-            gameRoom.assignPlayer(playerId);
+            gameRoom.selectColor(playerId, message.color());
         }
     }
 

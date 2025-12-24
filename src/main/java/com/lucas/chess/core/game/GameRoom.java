@@ -2,6 +2,8 @@ package com.lucas.chess.core.game;
 
 import com.lucas.chess.core.piece.Color;
 
+import java.util.Random;
+
 public class GameRoom {
     private final Game game;
     private String whitePlayerId;
@@ -19,6 +21,24 @@ public class GameRoom {
         return color == Color.WHITE
                 ? whitePlayerId != null
                 : blackPlayerId != null;
+    }
+
+    public void selectColor(String playerId, Color selectedColor) {
+        if(selectedColor == Color.WHITE) {
+            whitePlayerId = playerId;
+        } else if (selectedColor == Color.BLACK) {
+            blackPlayerId = playerId;
+        } else {
+            Random rand = new Random();
+            float random;
+            random = rand.nextFloat();
+            if(random > 0.5) {
+                whitePlayerId = playerId;
+            } else {
+                blackPlayerId = playerId;
+            }
+        }
+        numberOfPlayers++;
     }
 
     public Color assignPlayer(String playerId) {
