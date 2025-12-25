@@ -81,4 +81,25 @@ public class GameRoom {
     public int getNumberOfSpectators() {
         return numberOfSpectators;
     }
+
+    public GameResult getGameResult() {
+        if(game.isCheckmate()){
+            return GameResult.CHECKMATE;
+        } else if(game.isStalemate()) {
+            return GameResult.STALEMATE;
+        }
+        return null;
+    }
+
+    public Color getWinner() {
+        if(getGameResult() == null) return null;
+        switch(getGameResult()){
+            case RESIGNATION, CHECKMATE, TIMEOUT -> {
+                return game.getSideToMove() == Color.WHITE ? Color.BLACK : Color.WHITE;
+            }
+            default -> {
+                return null;
+            }
+        }
+    }
 }

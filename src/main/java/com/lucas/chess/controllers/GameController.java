@@ -93,14 +93,14 @@ public class GameController {
             gameRoom.getGame().switchSide();
             messagingTemplate.convertAndSend(
                     "/topic/game/fen/" + room,
-                    new BoardUpdateMessage(gameRoom.encodeFen(), MessageType.MOVE_APPROVED)
+                    new BoardUpdateMessage(gameRoom.encodeFen(), MessageType.MOVE_APPROVED, gameRoom.getGameResult(), gameRoom.getWinner())
             );
         } catch (IllegalMoveException | CloneNotSupportedException e) {
             System.out.println(e.getMessage());
             messagingTemplate.convertAndSendToUser(
                     playerId,
                     "/topic/game/fen/" + room,
-                    new BoardUpdateMessage(gameRoom.encodeFen(), MessageType.MOVE_REJECTED)
+                    new BoardUpdateMessage(gameRoom.encodeFen(), MessageType.MOVE_REJECTED, gameRoom.getGameResult(), gameRoom.getWinner())
             );
         }
     }

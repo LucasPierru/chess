@@ -47,14 +47,14 @@ public class Game {
         }
     }
 
-    private boolean isCheckmate() {
+    public boolean isCheckmate() {
         boolean isKingInCheck = moveGenerator.getBoard().isKingInCheck(sideToMove);
         boolean hasLegalMoves = moveGenerator.hasLegalMoves(sideToMove);
 
         return isKingInCheck && !hasLegalMoves;
     }
 
-    private boolean isStalemate() {
+    public boolean isStalemate() {
         boolean isKingInCheck = moveGenerator.getBoard().isKingInCheck(sideToMove);
         boolean hasLegalMoves = moveGenerator.hasLegalMoves(sideToMove);
 

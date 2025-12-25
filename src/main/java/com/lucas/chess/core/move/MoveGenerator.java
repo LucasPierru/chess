@@ -17,7 +17,7 @@ public final class MoveGenerator {
         this.moveHistory = new ArrayList<>();
     }
 
-    public void movePiece(Square from, Square to, PieceType promotion, Color sideToMove) throws IllegalMoveException, CloneNotSupportedException {
+    public boolean movePiece(Square from, Square to, PieceType promotion, Color sideToMove) throws IllegalMoveException, CloneNotSupportedException {
         Piece piece = board.getPiece(from.getRow(), from.getCol());
 
         if (piece == null) {
@@ -58,6 +58,7 @@ public final class MoveGenerator {
             throw new IllegalMoveException("Illegal move: " + piece.getClass().getSimpleName()
                     + " cannot move from " + from.translateSquareToNotation() + " to " + to.translateSquareToNotation());
         }
+        return isLegal;
     }
 
     public void printBoard() {
@@ -112,7 +113,7 @@ public final class MoveGenerator {
 
         for (Square square : squares) {
             for (Move move: legalMoves(square, sideToMove)) {
-                if (!move.getTo().equals(square)) continue;
+                if (move.getTo().equals(square)) continue;
                 Board testBoard = board.deepCopy();
                 applyMoveToBoardForValidation(testBoard, move);
                 boolean kingInCheckAfter = testBoard.isKingInCheck(sideToMove);

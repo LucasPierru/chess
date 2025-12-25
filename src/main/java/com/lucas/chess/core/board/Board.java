@@ -25,6 +25,19 @@ public class Board implements Cloneable  {
         return row >= 0 && row < 8 && col >= 0 && col < 8;
     }
 
+    private King getKing(Color pieceColor) {
+        Piece[][] pieces = this.board;
+        for (int i = 0; i < pieces.length; i++) {
+            for (int j = 0; j < pieces[i].length; j++){
+                Piece piece = pieces[i][j];
+                if (piece instanceof King king && piece.getColor() == pieceColor) {
+                    return king;
+                }
+            }
+        }
+        return null;
+    }
+
     public Square getKingPosition(Color pieceColor) {
         Piece[][] pieces = this.board;
         for (int i = 0; i < pieces.length; i++) {
@@ -144,7 +157,7 @@ public class Board implements Cloneable  {
     }
 
     public void initializeBoard() {
-        //Initialize white pieces
+        /*//Initialize white pieces
         this.board[0][0] = new Rook(Color.WHITE);
         this.board[0][1] = new Knight(Color.WHITE);
         this.board[0][2] = new Bishop(Color.WHITE);
@@ -178,14 +191,16 @@ public class Board implements Cloneable  {
         this.board[6][4] = new Pawn(Color.BLACK);
         this.board[6][5] = new Pawn(Color.BLACK);
         this.board[6][6] = new Pawn(Color.BLACK);
-        this.board[6][7] = new Pawn(Color.BLACK);
+        this.board[6][7] = new Pawn(Color.BLACK);*/
+        String initialFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        this.loadFromFEN("k7/3Q4/2K5/8/8/8/8/8 w - - 0 1");
 
         // initialize remaining squares without any main.java.chess.piece
-        for (int i = 2; i < 6; i++) {
+        /*for (int i = 2; i < 6; i++) {
             for (int j = 0; j < 8; j++) {
                 board[i][j] = null;
             }
-        }
+        }*/
     }
 
     public void print() {
@@ -238,5 +253,75 @@ public class Board implements Cloneable  {
         }
 
         return copy;
+    }
+
+    public void loadFromFEN(String fen) {
+        String[] ranks = getRanks(fen);
+
+        for (int fenRank = 0; fenRank < 8; fenRank++) {
+            int row = 7 - fenRank; // FEN starts from rank 8
+            int col = 0;
+
+            for (char c : ranks[fenRank].toCharArray()) {
+                if (Character.isDigit(c)) {
+                    col += c - '0';
+                } else {
+                    Color color = Character.isUpperCase(c) ? Color.WHITE : Color.BLACK;
+                    Piece piece = createPieceFromFEN(c, color);
+                    this.setPiece(row, col, piece);
+                    col++;
+                }
+            }
+        }
+    }
+
+    private static String[] getRanks(String fen) {
+        String[] parts = fen.trim().split("\\s+");
+        if (parts.length != 6) {
+            throw new IllegalArgumentException("Invalid FEN string");
+        }
+
+        String boardPart = parts[0];
+        /*String sidePart = parts[1];
+        String castlingPart = parts[2];
+        String enPassantPart = parts[3];
+        int halfMoveClock = Integer.parseInt(parts[4]);
+        int fullMoveNumber = Integer.parseInt(parts[5]);*/
+
+        // 1. PIECE PLACEMENT
+        String[] ranks = boardPart.split("/");
+        if (ranks.length != 8) {
+            throw new IllegalArgumentException("Invalid FEN board layout");
+        }
+        return ranks;
+    }
+
+    private Piece createPieceFromFEN(char fenChar, Color color) {
+        char c = Character.toLowerCase(fenChar);
+
+        return switch (c) {
+            case 'p' -> new Pawn(color);
+            case 'r' -> new Rook(color);
+            case 'n' -> new Knight(color);
+            case 'b' -> new Bishop(color);
+            case 'q' -> new Queen(color);
+            case 'k' -> new King(color);
+            default -> throw new IllegalArgumentException("Invalid FEN piece: " + fenChar);
+        };
+    }
+
+    private void applyCastlingRights(String castling) {
+        King whiteKing = this.getKing(Color.WHITE);
+        King blackKing = this.getKing(Color.BLACK);
+
+        if (whiteKing != null) {
+            whiteKing.setHasShortCastleRights(castling.contains("K"));
+            whiteKing.setHasLongCastleRights(castling.contains("Q"));
+        }
+
+        if (blackKing != null) {
+            blackKing.setHasShortCastleRights(castling.contains("k"));
+            blackKing.setHasLongCastleRights(castling.contains("q"));
+        }
     }
 }
