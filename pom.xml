@@ -72,13 +72,14 @@
                             <!-- Directory where TeaVM should put generated files. This configuration conforms to the settings
                                  of the WAR plugin -->
                             <targetDirectory>${project.build.directory}/generated/js/teavm</targetDirectory>
+                            <targetFileName>chess-engine.js</targetFileName>
 
                             <!-- Main class, containing static void main(String[]) -->
                             <mainClass>com.lucas.chess.wasm.MainClass</mainClass>
 
                             <!-- Whether TeaVM should produce minified JavaScript. Can reduce JavaScript file size more than
                                  two times -->
-                            <minifying>false</minifying>
+                            <minifying>true</minifying>
 
                             <!-- Whether TeaVM should produce debug information for its built-in debugger -->
                             <debugInformationGenerated>true</debugInformationGenerated>
@@ -92,6 +93,7 @@
 
                             <!-- Optimization level. Valid values are: SIMPLE, ADVANCED, FULL -->
                             <optimizationLevel>ADVANCED</optimizationLevel>
+                            <jsModuleType>ES2015</jsModuleType>
                         </configuration>
                     </execution>
                 </executions>

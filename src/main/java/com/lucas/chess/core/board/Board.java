@@ -193,7 +193,8 @@ public class Board implements Cloneable  {
         this.board[6][6] = new Pawn(Color.BLACK);
         this.board[6][7] = new Pawn(Color.BLACK);*/
         String initialFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-        this.loadFromFEN("k7/3Q4/2K5/8/8/8/8/8 w - - 0 1");
+        String testPosition = "k7/3Q4/2K5/8/8/8/8/8 w - - 0 1";
+        this.loadFromFEN(initialFen);
 
         // initialize remaining squares without any main.java.chess.piece
         /*for (int i = 2; i < 6; i++) {
